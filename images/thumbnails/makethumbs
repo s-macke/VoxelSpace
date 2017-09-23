@@ -1,0 +1,2 @@
+mogrify -strip -format png8 -path thumbs -quality 100 -thumbnail 150x150 ../maps/*.png
+for f in *.png8;do mv $f ${f/png8/png};done

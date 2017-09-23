@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; }
+        canvas { width: 100%; height: 100% }
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+                z-index:100;
+                color: black;
+                font-family: "Arial", Times, serif;
+                font-size: 120%;
+                }
+    </style>
+</head>
+
+<body>
+
+<div id="info">
+    Fly controls
+    <b>WASD</b> or <b>Cursor Keys</b> or <b>left click</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll </b> | Mouse Navigation on
+    &nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;
+<select name="Mapselector" size="1" onchange="LoadMap(this.value);" value="C1W;D1">
+
+<option value="C1W;D1">Map C1W</option>
+<option value="C2W;D2">Map C2W</option>
+<option value="C3;D3">Map C3</option>
+<option value="C4;D4">Map C4</option>
+<option value="C5W;D5">Map C5W</option>
+<option value="C6W;D6">Map C6W</option>
+<option value="C7W;D7">Map C7W</option>
+<option value="C8;D6">Map C8</option>
+<option value="C9W;D9">Map C9W</option>
+<option value="C10W;D10">Map C10W</option>
+<option value="C11W;D11">Map C11W</option>
+<option value="C12W;D11">Map C12W</option>
+<option value="C13;D13">Map C13</option>
+<option value="C14;D14">Map C14</option>
+<option value="C14W;D14">Map C14W</option>
+<option value="C15;D15">Map C15</option>
+<option value="C16W;D16">Map C16W</option>
+<option value="C17W;D17">Map C17W</option>
+<option value="C18W;D18">Map C18W</option>
+<option value="C19W;D19">Map C19W</option>
+<option value="C20W;D20">Map C20W</option>
+<option value="C21;D21">Map C21</option>
+<option value="C22W;D22">Map C22W</option>
+<option value="C23W;D21">Map C23W</option>
+<option value="C24W;D24">Map C24W</option>
+<option value="C25W;D25">Map C25W</option>
+<option value="C26W;D18">Map C26W</option>
+<option value="C27W;D15">Map C27W</option>
+<option value="C28W;D25">Map C28W</option>
+<option value="C29W;D16">Map C29W</option>
+<option value="">Map Comanche 3</option>
+</select>
+</div>
+
+<canvas id="myCanvas" width="800" height="400">
+    Your browser does not support the canvas element. 
+</canvas>
+
+<script>
+"use strict";
+
+var camera = 
+{
+    x: 512., // x position on the map
+    y: 800., // y position on the map
+    height: 78., // height of the camera
+    angle: 0., // direction of the camera
+    horizon: 100. // horizon position (look up and down)
+};
+
+var heightmap = new Uint8Array(1024*1024); // 1024*1024 byte array with height information
+var colormap = new Uint32Array(1024*1024);  // 1ß24*1ß24 byte array with color indices
+
+var bufarray = null; // color data
+var buf8 = null;     // the same array but with bytes
+var buf32 = null;    // the same array but with 32-Bit words
+
+var canvas = null;
+var context = null;
+var imagedata = null;
+
+
+// ---------------------------------------------
+// Keyboard and mouse interaction
+
+var kforward = false;
+var kbackward = false;
+var kleftright = 0;
+var kupdown = 0;
+var klookup = false;
+var klookdown = false;
+
+var updaterunning = false;
+var keypressed = false;
+
+var mouseposition = null;
+
+function UpdateCamera()
+{
+    keypressed = false;
+    if (kleftright != 0)
+    {
+        camera.angle += kleftright*0.1;
+        keypressed = true;
+    }
+    if (kforward)
+    {
+        camera.x -= 3. * Math.sin(camera.angle);
+        camera.y -= 3. * Math.cos(camera.angle);
+        keypressed = true;
+    }
+    if (kbackward)
+    {
+        camera.x += 3. * Math.sin(camera.angle);
+        camera.y += 3. * Math.cos(camera.angle);
+        keypressed = true;
+    }
+    if (kupdown != 0)
+    {
+        camera.height += kupdown;
+        keypressed = true;
+    }
+    if (klookup)
+    {
+        camera.horizon += 2;
+        keypressed = true;
+    }
+    if (klookdown)
+    {
+        camera.horizon -= 2;
+        keypressed = true;
+    }
+}
+
+function DetectMouseDown(e)
+{
+    kforward = true;
+    mouseposition = [e.pageX, e.pageY];
+
+    if (!updaterunning) Draw();
+    return;
+}
+
+function DetectMouseUp()
+{
+    mouseposition = null;
+    kforward = false;
+    kleftright = 0;
+    kupdown = 0;
+    return;
+}
+
+function DetectMouseMove(e)
+{
+    if (mouseposition == null) return;
+    if (kforward == false) return;
+    
+    
+    kleftright = (mouseposition[0]-e.pageX)*1e-3;
+    camera.horizon=100 + (mouseposition[1]-e.pageY)*0.5;
+    kupdown = (mouseposition[1]-e.pageY)*1e-2;
+}
+
+
+function DetectKeysDown(e)
+{
+    switch(e.keyCode)
+    {
+    case 37:    // left cursor
+    case 65:    // a
+        kleftright = +1;
+        break;
+    case 39:    // right cursor
+    case 68:    // d
+        kleftright = -1;
+        break;
+    case 38:    // cursor up
+    case 87:    // w
+        kforward = true;
+        break;
+    case 40:    // cursor down
+    case 83:    // s
+        kbackward = true;
+        break;
+    case 82:    // r
+        kupdown = +2;
+        break;
+    case 70:    // f
+        kupdown = -2;
+        break;
+    case 69:    // e
+        klookup = true;
+        break;
+    case 81:    //q
+        klookdown = true;
+        break;
+    default:
+        return;
+        break;
+    }
+
+    if (!updaterunning) Draw();
+    return false;
+}
+
+function DetectKeysUp(e)
+{
+    switch(e.keyCode)
+    {
+    case 37:    // left cursor
+    case 65:    // a
+        kleftright = 0;
+        break;
+    case 39:    // right cursor
+    case 68:    // d
+        kleftright = 0;
+        break;
+    case 38:    // cursor up
+    case 87:    // w
+        kforward = false;
+        break;
+    case 40:    // cursor down
+    case 83:    // s
+        kbackward = false;
+        break;
+    case 82:    // r
+        kupdown = 0;
+        break;
+    case 70:    // f
+        kupdown = 0;
+        break;
+    case 69:    // e
+        klookup = false;
+        break;
+    case 81:    //q
+        klookdown = false;
+        break;
+    default:
+        return;
+        break;
+    }
+    return false;
+}
+
+// ---------------------------------------------
+
+function DownloadImagesAsync(urls, OnSuccess) {
+    var pending = urls.length;
+    var result = [];
+    if (pending === 0) {
+        setTimeout(onsuccess.bind(null, result), 0);
+        return;
+    }
+    urls.forEach(function(url, i) {
+        var image = new Image();
+        //image.addEventListener("load", function() {
+        image.onload = function() {
+            var tempcanvas = document.createElement("canvas");
+            var tempcontext = tempcanvas.getContext("2d");
+            tempcanvas.width = 1024;
+            tempcanvas.height = 1024;
+            tempcontext.drawImage(image, 0, 0, 1024, 1024 );
+            
+            result[i] = tempcontext.getImageData(0, 0, 1024, 1024).data;
+            pending--;
+            if (pending === 0) {
+                OnSuccess(result);
+            }
+        };
+        image.src = url;
+    });
+}
+
+function VLine(x, ytop, ybottom, col)
+{
+    x = x|0;
+    ytop = ytop|0;
+    ybottom = ybottom|0;
+    col = col|0;
+    var screenwidth = canvas.width|0;
+    if (ytop < 0) ytop = 0;
+    if (ytop > ybottom) return;
+    
+    // get offset on screen for the vertical line
+    var offset = ((ytop * screenwidth) + x)|0;
+    for (var k = ytop|0; k < ybottom|0; k=k+1|0) 
+    {
+        buf32[offset|0] = col|0;
+        offset = offset + screenwidth|0;
+    }
+}
+
+function DrawBackground()
+{
+    var color = 0xFFFFA0A0;
+    for (var i = 0; i < buf32.length; i++) buf32[i] = color|0;
+}
+
+// Show the back buffer on screen
+function Flip()
+{
+    imagedata.data.set(buf8);
+    context.putImageData(imagedata, 0, 0);
+}
+
+function Raycast()
+{
+    var screenwidth = canvas.width|0; 
+    var sinang = Math.sin(camera.angle);
+    var cosang = Math.cos(camera.angle);
+
+    var hiddeny = new Int32Array(screenwidth);
+    for(var i=0; i<canvas.width|0; i=i+1|0)
+    {
+        hiddeny[i] = canvas.height;
+    }
+    var dz = 1.;
+
+    // Draw from front to back
+    for(var z=1; z<600; z+=dz)
+    {
+        // 90 degree field of view
+        var plx =  -cosang * z - sinang * z;
+        var ply =   sinang * z - cosang * z;
+        var prx =   cosang * z - sinang * z;
+        var pry =  -sinang * z - cosang * z;
+        
+        var dx = (prx - plx) / screenwidth;
+        var dy = (pry - ply) / screenwidth;
+        plx += camera.x;
+        ply += camera.y;
+        var invz = 1. / z * 240.;
+        for(var i=0; i<screenwidth|0; i=i+1|0)
+        {
+            var mapoffset = ((Math.floor(ply) & 1023) << 10) + (Math.floor(plx) & 1023)|0;
+            var screenheight = (camera.height - heightmap[mapoffset]) * invz + camera.horizon|0;
+            VLine(i, screenheight, hiddeny[i], colormap[mapoffset]);
+            if (screenheight < hiddeny[i]) hiddeny[i] = screenheight;
+            plx += dx;
+            ply += dy;
+        }
+    }
+    dz += 0.01;
+}
+
+function Draw()
+{
+    updaterunning = true;
+    UpdateCamera();
+    DrawBackground();
+    Raycast();
+    Flip();
+    
+    if (!keypressed) 
+    {
+        updaterunning = false;
+    } else
+    {
+        window.setTimeout(Draw, 0);
+    }
+}
+
+function LoadMap(filenames)
+{
+   var files = filenames.split(";");
+   DownloadImagesAsync(["maps/"+files[0]+".png", "maps/"+files[1]+".png"], OnLoadedImages);
+}
+
+function OnLoadedImages(result)
+{
+    var datac = result[0];
+    var datah = result[1];
+    for(var i=0; i<1024*1024; i++)
+    {
+        colormap[i] = 0xFF000000 | (datac[(i<<2) + 2] << 16) | (datac[(i<<2) + 1] << 8) | datac[(i<<2) + 0];
+        heightmap[i] = datah[i<<2];
+    }
+    Draw();
+}
+
+
+function Init()
+{
+    canvas = document.getElementById('myCanvas');
+    if (canvas.getContext)
+    {
+        context = canvas.getContext('2d');
+        imagedata = context.createImageData(canvas.width, canvas.height);
+    }
+
+    bufarray = new ArrayBuffer(imagedata.width*imagedata.height*4);
+    buf8 = new Uint8Array(bufarray);
+    buf32 = new Uint32Array(bufarray);
+    
+    for(var i=0; i<1024*1024; i++)
+    {
+        colormap[i] = 0xFF007050;
+        heightmap[i] = 0;
+    }    
+    
+    LoadMap("C1W;D1");
+    document.onkeydown   = DetectKeysDown;
+    document.onkeyup     = DetectKeysUp;
+    document.onmousedown = DetectMouseDown;
+    document.onmouseup   = DetectMouseUp;
+    document.onmousemove = DetectMouseMove;
+    
+    Draw();
+} 
+
+Init();
+
+</script>
+
+</body>
