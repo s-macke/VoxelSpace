@@ -4,12 +4,35 @@ Landscape rendering in 20 lines of code
 * [Project demo][project demo] page
 
 ## History
-It was in the year 1992 when I saw pictures of the upcoming game Comanche from Novalogic. The graphics were awesome and in my opinion 5 years ahead of its time. During that time 3D Graphic accelerators were unknown or unaffordable. Comanche uses a technique called voxel space similar to raycasting. To display the landscape a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. The algorithm draws vertical lines by shooting a ray from the camera into the map. The following figure demonstrate this technique. 
 
+Let us go back to the year 1992. Processing power were 1000 times slower and acceleration via a GPU were unknown or unaffordable.
+3D games graphics used very simple rendering algorithms and showed mostly polyons with a simple color.
 ![Game Gunship 2000 in 1991](images/gunship2000-1991.gif)
+
+It was during that year Novalogic published the game Comanche. 
 ![Game Comanche in 1992](images/comanche-1992.gif)
 
+The graphics were awesome and in my opinion 3-5 years ahead of its time. You see a lot more details, shading and even shadows. And all this with the same processing power as other 3D games.
+
 ## Technique
+
+Comanche uses a technique called voxel space similar to raycasting. To display the landscape a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. The algorithm draws vertical lines by shooting a ray from the camera into the map. The following figure demonstrate this technique. 
+
+
+```python
+def Draw(p, height, horizon, screen_width):
+    for z in range(240, 1, -1):
+        pl = Point(-z + p.x, -z + p.y)
+        pr = Point( z + p.x, -z + p.y)
+        dx = (pr.x-pl.x) / screen_width
+        for i in range(0, screen_width):
+            VerticalLine(i, 
+                (height - heightmap[pl.x, pl.y]) / z * 60. + horizon,
+                colormap[pl.x, pl.y])
+            p1.x += dx
+
+Draw( Point(590, 175), 50, 120, 700 )
+```
 
 ## Maps
 [color](maps/C1W.png),
