@@ -16,23 +16,40 @@ The graphics were awesome and in my opinion 3-5 years ahead of its time. You see
 
 ## Technique
 
-Comanche uses a technique called voxel space similar to raycasting. To display the landscape a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. The algorithm draws vertical lines by shooting a ray from the camera into the map. The following figure demonstrate this technique. 
+Comanche uses a technique called voxel space similar to raycasting. To display the landscape a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. The algorithm draws vertical lines by shooting a ray from the camera into the map. The following figure demonstrate this technique.
 
+![Line by line](images/linebyline.gif)
+
+ * Clear Screen.
+ * For visible surface determination start from the back and render to the front
+ * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and persective correction.
+ * Segment the line so that it matches the number of columns of the screen.
+ * Load the height and color from the 2D maps corresponding of the segment of the line.
+ * Do some perspective corrections for the height coordinate.
+ * Draw a vertical line with the corresponding color with the height retrieved from the perspective correction.
+
+The core algorithm contains in its simplest form only a few lines of code:
 
 ```python
 def Draw(p, height, horizon, screen_width):
+    # Draw from back to the front (high z coordinate to low z coordinate)
     for z in range(240, 1, -1):
-        pl = Point(-z + p.x, -z + p.y)
-        pr = Point( z + p.x, -z + p.y)
-        dx = (pr.x-pl.x) / screen_width
+        # Find line on map. This calculation corresponds to a field of view of 90°
+        pleft = Point(-z + p.x, -z + p.y)
+        pright = Point( z + p.x, -z + p.y)        
+        # segment the line
+        dx = (pright.x-pleft.x) / screen_width
+        # Draw vertical line for each segment
         for i in range(0, screen_width):
-            VerticalLine(i, 
-                (height - heightmap[pl.x, pl.y]) / z * 60. + horizon,
-                colormap[pl.x, pl.y])
-            p1.x += dx
-
-Draw( Point(590, 175), 50, 120, 700 )
+            DrawVerticalLine(i, 
+                (height - heightmap[pleft.x, pleft.y]) / z * 120. + horizon,
+                colormap[pleft.x, pleft.y])
+            p1eft.x += dx
+            
+# call the drawing function with position, height, horizon line and screen width parameter
+Draw( Point(0, 0), 50, 120, 700 )
 ```
+There are of course a lot of tricks to get higher performance not mentioned here.
 
 ## Maps
 [color](maps/C1W.png),
