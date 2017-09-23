@@ -1,5 +1,5 @@
 # Voxel-Space
-Landscape rendering in 20 lines of code
+Landscape rendering in less than 20 lines of code
 
 * [Project demo][project demo] page
 
@@ -16,7 +16,14 @@ The graphics were awesome and in my opinion 3-5 years ahead of its time. You see
 
 ## Technique
 
-Comanche uses a technique called voxel space similar to raycasting. To display the landscape a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. The algorithm draws vertical lines by shooting a ray from the camera into the map. The following figure demonstrate this technique.
+Comanche uses a technique called voxel space similar to raycasting. 
+
+To display the landscape a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. These maps are periodic:
+
+![periodic map](images/periodicmap.gif)
+
+
+The algorithm draws just vertical lines. The following figure demonstrate this technique.
 
 ![Line by line](images/linebyline.gif)
 
