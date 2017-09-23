@@ -65,13 +65,13 @@
 </div>
 
 <canvas id="myCanvas" width="800" height="400">
-    Your browser does not support the canvas element. 
+    Your browser does not support the canvas element.
 </canvas>
 
 <script>
 "use strict";
 
-var camera = 
+var camera =
 {
     x: 512., // x position on the map
     y: 800., // y position on the map
@@ -81,7 +81,7 @@ var camera =
 };
 
 var heightmap = new Uint8Array(1024*1024); // 1024*1024 byte array with height information
-var colormap = new Uint32Array(1024*1024);  // 1ß24*1ß24 byte array with color indices
+var colormap = new Uint32Array(1024*1024);  // 1024*1024 byte array with color indices
 
 var bufarray = null; // color data
 var buf8 = null;     // the same array but with bytes
@@ -166,8 +166,8 @@ function DetectMouseMove(e)
 {
     if (mouseposition == null) return;
     if (kforward == false) return;
-    
-    
+
+
     kleftright = (mouseposition[0]-e.pageX)*1e-3;
     camera.horizon=100 + (mouseposition[1]-e.pageY)*0.5;
     kupdown = (mouseposition[1]-e.pageY)*1e-2;
@@ -272,7 +272,7 @@ function DownloadImagesAsync(urls, OnSuccess) {
             tempcanvas.width = 1024;
             tempcanvas.height = 1024;
             tempcontext.drawImage(image, 0, 0, 1024, 1024 );
-            
+
             result[i] = tempcontext.getImageData(0, 0, 1024, 1024).data;
             pending--;
             if (pending === 0) {
@@ -292,10 +292,10 @@ function VLine(x, ytop, ybottom, col)
     var screenwidth = canvas.width|0;
     if (ytop < 0) ytop = 0;
     if (ytop > ybottom) return;
-    
+
     // get offset on screen for the vertical line
     var offset = ((ytop * screenwidth) + x)|0;
-    for (var k = ytop|0; k < ybottom|0; k=k+1|0) 
+    for (var k = ytop|0; k < ybottom|0; k=k+1|0)
     {
         buf32[offset|0] = col|0;
         offset = offset + screenwidth|0;
@@ -317,7 +317,7 @@ function Flip()
 
 function Raycast()
 {
-    var screenwidth = canvas.width|0; 
+    var screenwidth = canvas.width|0;
     var sinang = Math.sin(camera.angle);
     var cosang = Math.cos(camera.angle);
 
@@ -336,7 +336,7 @@ function Raycast()
         var ply =   sinang * z - cosang * z;
         var prx =   cosang * z - sinang * z;
         var pry =  -sinang * z - cosang * z;
-        
+
         var dx = (prx - plx) / screenwidth;
         var dy = (pry - ply) / screenwidth;
         plx += camera.x;
@@ -362,8 +362,8 @@ function Draw()
     DrawBackground();
     Raycast();
     Flip();
-    
-    if (!keypressed) 
+
+    if (!keypressed)
     {
         updaterunning = false;
     } else
@@ -403,22 +403,24 @@ function Init()
     bufarray = new ArrayBuffer(imagedata.width*imagedata.height*4);
     buf8 = new Uint8Array(bufarray);
     buf32 = new Uint32Array(bufarray);
-    
+
     for(var i=0; i<1024*1024; i++)
     {
         colormap[i] = 0xFF007050;
         heightmap[i] = 0;
-    }    
-    
+    }
+
     LoadMap("C1W;D1");
     document.onkeydown   = DetectKeysDown;
     document.onkeyup     = DetectKeysUp;
     document.onmousedown = DetectMouseDown;
     document.onmouseup   = DetectMouseUp;
     document.onmousemove = DetectMouseMove;
-    
+    document.touchstart  = DetectMouseDown;
+    document.touchend    = DetectMouseUp;
+    document.touchmove   = DetectMouseMove;
     Draw();
-} 
+}
 
 Init();
 
