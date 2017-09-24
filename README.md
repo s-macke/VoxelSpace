@@ -38,7 +38,7 @@ The algorithm draws just vertical lines. The following figure demonstrate this t
 The core algorithm contains in its simplest form only a few lines of code (python syntax):
 
 ```python
-def Render(p, height, horizon, scale_height, distance, screen_width):
+def Render(p, height, horizon, scale_height, distance, screen_width, screen_height):
     # Draw from back to the front (high z coordinate to low z coordinate)
     for z in range(distance, 1, -1):
         # Find line on map. This calculation corresponds to a field of view of 90°
@@ -48,15 +48,14 @@ def Render(p, height, horizon, scale_height, distance, screen_width):
         dx = (pright.x - pleft.x) / screen_width
         # Draw vertical line for each segment
         for i in range(0, screen_width):
-            DrawVerticalLine(i, 
-                (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon,
-                colormap[pleft.x, pleft.y])
+            height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
+            DrawVerticalLine(i, height_on_screen, screen_height, colormap[pleft.x, pleft.y])
             p1eft.x += dx
             
-# Call the drawing function with the camera parameters:
+# Call the render function with the camera parameters:
 # position, height, horizon line position, 
-# scaling factor for the height, the largest distance, and the screen width parameter
-Render( Point(0, 0), 50, 120, 120, 300, 700 )
+# scaling factor for the height, the largest distance, the screen width and the screen height parameter
+Render( Point(0, 0), 50, 120, 120, 300, 800, 600 )
 ```
 
 ### Add rotation
@@ -66,7 +65,7 @@ With the algorithm above we can only view to the north. A different angle needs 
 ![rotation](images/rotate.gif)
 
 ```python
-def Render(p, phi, height, horizon, scale_height, distance, screen_width):
+def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen_height):
     # precalculate viewing angle parameters
     var sinphi = math.sin(phi);
     var cosphi = math.cos(phi);
@@ -88,16 +87,16 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width):
 
         # Draw vertical line for each segment
         for i in range(0, screen_width):
-            DrawVerticalLine(i, 
-                (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon,
-                colormap[pleft.x, pleft.y])
+            height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
+            DrawVerticalLine(i, height_on_screen, screen_height, colormap[pleft.x, pleft.y])
             p1eft.x += dx
             p1eft.y += dy
 
-# Call the drawing function with the camera parameters:
+# Call the render function with the camera parameters:
 # position, viewing angle, height, horizon line position, 
-# scaling factor for the height, the largest distance, and the screen width parameter
-Render( Point(0, 0), 0, 50, 120, 120, 300, 700 )
+# scaling factor for the height, the largest distance, 
+# the screen width and the screen height parameter
+Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 ```
 
 
@@ -109,6 +108,55 @@ There are of course a lot of tricks to achieve higher performance.
 * Render more details in front but less details far away
 
 ![front to back rendering](images/fronttoback.gif)
+
+```python
+def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen_height):
+    # precalculate viewing angle parameters
+    var sinphi = math.sin(phi);
+    var cosphi = math.cos(phi);
+    
+    # initialize visibility array. Y position for each column on screen 
+    hidden = np.zeros(screen_width)
+    for i in range(0, screen_width):
+        hidden[i] = screen_height
+
+    # Draw from front to the back (low z coordinate to high z coordinate)
+    dz = 1.
+    z = 1.
+    while z < distance
+        # Find line on map. This calculation corresponds to a field of view of 90°
+        pleft = Point(
+            (-cosphi*z - sinphi*z) + p.x,
+            ( sinphi*z - cosphi*z) + p.y)
+        pright = Point(
+            ( cosphi*z - sinphi*z) + p.x,
+            (-sinphi*z - cosphi*z) + p.y)
+        
+        # segment the line
+        dx = (pright.x - pleft.x) / screen_width
+        dy = (pright.y - pleft.y) / screen_width
+
+        # Draw vertical line for each segment
+        for i in range(0, screen_width):
+            height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
+            DrawVerticalLine(i, height_on_screen, hidden[i], colormap[pleft.x, pleft.y])
+            if height_on_screen < hidden[i]:
+                hidden[i] = heightonscreen            
+            p1eft.x += dx
+            p1eft.y += dy
+            
+        # Go to next line and increase step size when you are far away
+        z += dz
+        dz += 0.2
+
+# Call the render function with the camera parameters:
+# position, viewing angle, height, horizon line position, 
+# scaling factor for the height, the largest distance, 
+# the screen width and the screen height parameter
+Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
+```
+
+
 
 ## Maps
 [color](maps/C1W.png),
