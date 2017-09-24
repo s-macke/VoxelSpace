@@ -12,7 +12,7 @@ Let us go back to the year 1992. Processing power were 1000 times slower and acc
 It was during that year Novalogic published the game Comanche. 
 ![Game Comanche in 1992](images/comanche-1992.gif)
 
-The graphics were awesome and in my opinion 3-5 years ahead of its time. You see a lot more details, shading and even shadows. And all this with the same processing power as other 3D games.
+The graphics were awesome and in my opinion 3-5 years ahead of its time. You see a lot more details, shading and even shadows. Of course the processing power didn't change.
 
 ## Render algorithm
 
