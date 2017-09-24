@@ -29,10 +29,10 @@ The algorithm draws just vertical lines. The following figure demonstrate this t
 
  * Clear Screen.
  * For visible surface determination start from the back and render to the front
- * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and persective correction.
+ * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#) (Objects are smaller farther away)
  * Segment the line so that it matches the number of columns of the screen.
  * Load the height and color from the 2D maps corresponding of the segment of the line.
- * Do some perspective corrections for the height coordinate.
+ * Perform the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#) for the height coordinate.
  * Draw a vertical line with the corresponding color with the height retrieved from the perspective correction.
 
 The core algorithm contains in its simplest form only a few lines of code (python syntax):
@@ -155,8 +155,6 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
 # the screen width and the screen height parameter
 Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 ```
-
-
 
 ## Maps
 [color](maps/C1W.png),
