@@ -8,13 +8,14 @@
     <meta name="keywords" content="Voxel, VoxelSpace, Voxel Space, Comanche, landscape, rendering">
     <style>
         body { margin: 0; }
-        canvas { width: 100%; height: 100% }
+        canvas { width: 100%; height: 100%; }
+        a { color: white; }
         #info {
             position: absolute;
             top: 0px; width: 100%;
             padding: 5px;
             z-index:100;
-            color: black;
+            color: white;
             font-family: "Arial", Times, serif;
             font-size: 120%;
             }
@@ -25,8 +26,7 @@
 
 <div id="info">
     Fly controls
-    <b>WASD</b> or <b>Cursor Keys</b> or <b>left click</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll </b> | Mouse Navigation on
-    &nbsp;&nbsp;&nbsp;
+    <b>WASD</b> or <b>Cursor Keys</b> or <b>left click</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll </b>,  Mouse Navigation on,
     &nbsp;&nbsp;&nbsp;
 <select name="Mapselector" size="1" onchange="LoadMap(this.value);" value="C1W;D1">
 
@@ -62,7 +62,9 @@
 <option value="C29W;D16">Map C29W</option>
 <option value="">Map Comanche 3</option>
 </select>
+<a href="https://github.com/s-macke/VoxelSpace">Github project page</a>
 </div>
+
 
 <canvas id="myCanvas" width="800" height="400">
     Your browser does not support the canvas element.
@@ -304,7 +306,7 @@ function VLine(x, ytop, ybottom, col)
 
 function DrawBackground()
 {
-    var color = 0xFFFFA0A0;
+    var color = 0xFFE09090;
     for (var i = 0; i < buf32.length; i++) buf32[i] = color|0;
 }
 
