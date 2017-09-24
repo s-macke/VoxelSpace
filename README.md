@@ -19,11 +19,15 @@ The graphics were awesome and in my opinion 3-5 years ahead of its time. You see
 
 ## Render algorithm
 
-[Comanche](https://en.wikipedia.org/wiki/Comanche_(video_game_series)) uses a technique called [Voxel Space](https://en.wikipedia.org/wiki/Voxel_Space) similar to [ray casting](https://en.wikipedia.org/wiki/Ray_casting).
+[Comanche](https://en.wikipedia.org/wiki/Comanche_(video_game_series)) uses a technique called [Voxel Space](https://en.wikipedia.org/wiki/Voxel_Space), which is based on the same ideas like [ray casting](https://en.wikipedia.org/wiki/Ray_casting). Hence the Voxel Space engine is a 2.5D engine, it doesn't have all the levels of freedom that a regular 3D engine offers.
 
-To display the landscape a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. These maps are periodic:
+### Height map and color map
+
+The easiest way to represent a terrain is through a height map and color map. For the game Comanche a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. These maps are periodic:
 
 ![periodic map](images/periodicmap.gif)
+
+Such maps limit the terrain to "one height per position on the map"- Complex geometries like buildings are not possible to represent.
 
 ### Basic algorithm
 The algorithm draws just vertical lines. The following figure demonstrate this technique.
@@ -343,5 +347,10 @@ Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 # Project demo
 
 [Project demo][project demo] page
+
+
+#Links
+
+[Voxel terrain engine - an introduction](https://web.archive.org/web/20131113094653/http://www.codermind.com/articles/Voxel-terrain-engine-building-the-terrain.html)
 
 [project demo]: https://s-macke.github.io/VoxelSpace/VoxelSpace.html
