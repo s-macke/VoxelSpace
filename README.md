@@ -163,6 +163,16 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
 Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 ```
 
+## Links
+
+[Web Project demo][project demo] page
+
+[Voxel terrain engine - an introduction](https://web.archive.org/web/20131113094653/http://www.codermind.com/articles/Voxel-terrain-engine-building-the-terrain.html)
+
+[Personal website](http://www.simulationcorner.net)
+
+
+
 ## Maps
 [color](maps/C1W.png),
 [height](maps/D1.png)
@@ -344,13 +354,7 @@ Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 ![C29W.png](images/thumbnails/C29W.png)
 ![D16.png](images/thumbnails/D16.png)
 
-# Project demo
-
-[Project demo][project demo] page
 
 
-#Links
-
-[Voxel terrain engine - an introduction](https://web.archive.org/web/20131113094653/http://www.codermind.com/articles/Voxel-terrain-engine-building-the-terrain.html)
 
 [project demo]: https://s-macke.github.io/VoxelSpace/VoxelSpace.html
