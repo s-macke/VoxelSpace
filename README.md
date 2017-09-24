@@ -14,7 +14,7 @@ It was during that year Novalogic published the game Comanche.
 
 The graphics were awesome and in my opinion 3-5 years ahead of its time. You see a lot more details, shading and even shadows. And all this with the same processing power as other 3D games.
 
-## Technique
+## Render algorithm
 
 Comanche uses a technique called voxel space similar to raycasting. 
 
@@ -22,7 +22,7 @@ To display the landscape a 1024*1024 one byte height map and a 1024*1024 color m
 
 ![periodic map](images/periodicmap.gif)
 
-
+### Basic algorithm
 The algorithm draws just vertical lines. The following figure demonstrate this technique.
 
 ![Line by line](images/linebyline.gif)
@@ -35,27 +35,59 @@ The algorithm draws just vertical lines. The following figure demonstrate this t
  * Do some perspective corrections for the height coordinate.
  * Draw a vertical line with the corresponding color with the height retrieved from the perspective correction.
 
-The core algorithm contains in its simplest form only a few lines of code:
+The core algorithm contains in its simplest form only a few lines of code (python syntax):
 
 ```python
-def Draw(p, height, horizon, screen_width):
+def Render(p, height, horizon, scale_height, distance, screen_width):
     # Draw from back to the front (high z coordinate to low z coordinate)
-    for z in range(240, 1, -1):
+    for z in range(distance, 1, -1):
+        # Find line on map. This calculation corresponds to a field of view of 90°
+        pleft  = Point(-z + p.x, -z + p.y)
+        pright = Point( z + p.x, -z + p.y)        
+        # segment the line
+        dx = (pright.x - pleft.x) / screen_width
+        # Draw vertical line for each segment
+        for i in range(0, screen_width):
+            DrawVerticalLine(i, 
+                (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon,
+                colormap[pleft.x, pleft.y])
+            p1eft.x += dx
+            
+# call the drawing function with position, height, horizon line position, 
+# scaling factor for the height, the largest distance, and the screen width parameter
+Render( Point(0, 0), 50, 120, 120, 300, 700 )
+```
+
+### Add rotation
+
+![rotation](images/rotate.gif)
+
+```python
+def Render(p, height, horizon, scale_height, distance, screen_width):
+    # Draw from back to the front (high z coordinate to low z coordinate)
+    for z in range(distance, 1, -1):
         # Find line on map. This calculation corresponds to a field of view of 90°
         pleft = Point(-z + p.x, -z + p.y)
         pright = Point( z + p.x, -z + p.y)        
         # segment the line
-        dx = (pright.x-pleft.x) / screen_width
+        dx = (pright.x - pleft.x) / screen_width
+        dy = (pright.y - pleft.y) / screen_width
         # Draw vertical line for each segment
         for i in range(0, screen_width):
             DrawVerticalLine(i, 
-                (height - heightmap[pleft.x, pleft.y]) / z * 120. + horizon,
+                (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon,
                 colormap[pleft.x, pleft.y])
             p1eft.x += dx
+            p1eft.y += dy
             
-# call the drawing function with position, height, horizon line and screen width parameter
-Draw( Point(0, 0), 50, 120, 700 )
+# call the drawing function with position, height, horizon line position, 
+# scaling factor for the height, the largest distance, and the screen width parameter
+Render( Point(0, 0), 50, 120, 120, 300, 700 )
 ```
+
+
+### More performance
+
 There are of course a lot of tricks to get higher performance not mentioned here.
 
 ## Maps
