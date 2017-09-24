@@ -23,11 +23,11 @@ The graphics were awesome and in my opinion 3-5 years ahead of its time. You see
 
 ### Height map and color map
 
-The easiest way to represent a terrain is through a height map and color map. For the game Comanche a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. These maps are periodic:
+The easiest way to represent a terrain is through a height map and color map. For the game Comanche a 1024*1024 one byte height map and a 1024*1024 one byte color map is used which you can download on this site. These maps are periodic:
 
 ![periodic map](images/periodicmap.gif)
 
-Such maps limit the terrain to "one height per position on the map"- Complex geometries like buildings are not possible to represent.
+Such maps limit the terrain to "one height per position on the map" - Complex geometries such as buildings or trees are not possible to represent. A great advantage of the colormap is, that it already contains the shading and shadows. That Voxel Space engine just takes the color and doesn't have to compute illumination during the render process.
 
 ### Basic algorithm
 The algorithm draws just vertical lines. The following figure demonstrate this technique.
