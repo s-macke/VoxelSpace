@@ -9,15 +9,15 @@
     <style>
         body { margin: 0; }
         canvas { width: 100%; height: 100% }
-            #info {
-                position: absolute;
-                top: 0px; width: 100%;
-                padding: 5px;
-                z-index:100;
-                color: black;
-                font-family: "Arial", Times, serif;
-                font-size: 120%;
-                }
+        #info {
+            position: absolute;
+            top: 0px; width: 100%;
+            padding: 5px;
+            z-index:100;
+            color: black;
+            font-family: "Arial", Times, serif;
+            font-size: 120%;
+            }
     </style>
 </head>
 
@@ -390,10 +390,15 @@ function OnLoadedImages(result)
     Draw();
 }
 
-
-function Init()
+function OnResizeWindow()
 {
     canvas = document.getElementById('myCanvas');
+
+    var aspect = window.innerWidth / window.innerHeight;
+
+    canvas.width = window.innerWidth<800?window.innerWidth:800;
+    canvas.height = canvas.width / aspect;
+
     if (canvas.getContext)
     {
         context = canvas.getContext('2d');
@@ -403,7 +408,11 @@ function Init()
     bufarray = new ArrayBuffer(imagedata.width*imagedata.height*4);
     buf8 = new Uint8Array(bufarray);
     buf32 = new Uint32Array(bufarray);
+    Draw();
+}
 
+function Init()
+{
     for(var i=0; i<1024*1024; i++)
     {
         colormap[i] = 0xFF007050;
@@ -411,6 +420,8 @@ function Init()
     }
 
     LoadMap("C1W;D1");
+    OnResizeWindow();
+
     document.onkeydown   = DetectKeysDown;
     document.onkeyup     = DetectKeysUp;
     document.onmousedown = DetectMouseDown;
@@ -419,7 +430,7 @@ function Init()
     document.touchstart  = DetectMouseDown;
     document.touchend    = DetectMouseUp;
     document.touchmove   = DetectMouseMove;
-    Draw();
+    window.onresize      = OnResizeWindow;
 }
 
 Init();
