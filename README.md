@@ -4,8 +4,7 @@
 
 ## History
 
-Let us go back to the year 1992. Processing power were 1000 times slower and acceleration via a GPU were unknown or unaffordable.
-3D games graphics used very simple rendering algorithms and showed mostly polyons with a simple color.
+Let us go back to the year 1992. The CPUs were 1000 times slower than today and the acceleration via a GPU was unknown or unaffordable. 3D games were calculated exclusively on the CPU and the rendering engine rendered filled polygons with a single color.
 
 ![Game Gunship 2000 in 1991](images/gunship2000-1991.gif)
 *Game Gunship 2000 published by MicroProse in 1991*
@@ -15,7 +14,7 @@ It was during that year [NovaLogic](http://www.novalogic.com/) published the gam
 ![Game Comanche in 1992](images/comanche-1992.gif)
 *Game Comanche published by NovaLogic in 1992*
 
-The graphics were awesome and in my opinion 3-5 years ahead of its time. You see a lot more details, shading and even shadows. Of course the processing power didn't change.
+The graphics were breathtaking for the time being and in my opinion 3 years ahead of its time. You see many more details such as textures on mountains and valleys, and for the first time a neat shading and even shadows. Sure, it's pixelated, but all games in those years were pixelated.
 
 ## Render algorithm
 
