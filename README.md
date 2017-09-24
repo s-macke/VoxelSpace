@@ -16,7 +16,7 @@ The graphics were awesome and in my opinion 3-5 years ahead of its time. You see
 
 ## Render algorithm
 
-Comanche uses a technique called voxel space similar to raycasting. 
+Comanche uses a technique called voxel space similar to [ray casting](https://en.wikipedia.org/wiki/Ray_casting).
 
 To display the landscape a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. These maps are periodic:
 
