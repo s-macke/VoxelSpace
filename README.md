@@ -103,7 +103,12 @@ Render( Point(0, 0), 0, 50, 120, 120, 300, 700 )
 
 ### More performance
 
-There are of course a lot of tricks to get higher performance.
+There are of course a lot of tricks to achieve higher performance.
+
+* Instead of drawing from back to the front we can draw from front to back. The advantage is, the we don't have to draw lines to the bootom of the screen. However, you need more logic for the visibility calcuation
+* Render more details in front but less details far away
+
+![front to back rendering](images/fronttoback.gif)
 
 ## Maps
 [color](maps/C1W.png),
