@@ -1,4 +1,4 @@
-# Voxel-Space
+# Voxel Space
 Landscape rendering in less than 20 lines of code
 
 * [Project demo][project demo] page
@@ -11,7 +11,7 @@ Let us go back to the year 1992. Processing power were 1000 times slower and acc
 ![Game Gunship 2000 in 1991](images/gunship2000-1991.gif)
 *Game Gunship 2000 published by MicroProse in 1991*
 
-It was during that year NovaLogic published the game Comanche.
+It was during that year [NovaLogic](http://www.novalogic.com/) published the game [Comanche](https://en.wikipedia.org/wiki/Comanche_(video_game_series)).
 
 ![Game Comanche in 1992](images/comanche-1992.gif)
 *Game Comanche published by NovaLogic in 1992*
@@ -20,7 +20,7 @@ The graphics were awesome and in my opinion 3-5 years ahead of its time. You see
 
 ## Render algorithm
 
-Comanche uses a technique called voxel space similar to [ray casting](https://en.wikipedia.org/wiki/Ray_casting).
+[Comanche](https://en.wikipedia.org/wiki/Comanche_(video_game_series)) uses a technique called [Voxel Space](https://en.wikipedia.org/wiki/Voxel_Space) similar to [ray casting](https://en.wikipedia.org/wiki/Ray_casting).
 
 To display the landscape a 1024*1024 one byte height map and a 1024*1024 color map is used which you can download on this site. These maps are periodic:
 
