@@ -27,7 +27,7 @@ The easiest way to represent a terrain is through a height map and color map. Fo
 
 ![periodic map](images/periodicmap.gif)
 
-Such maps limit the terrain to "one height per position on the map" - Complex geometries such as buildings or trees are not possible to represent. A great advantage of the colormap is, that it already contains the shading and shadows. That Voxel Space engine just takes the color and doesn't have to compute illumination during the render process.
+Such maps limit the terrain to "one height per position on the map" - Complex geometries such as buildings or trees are not possible to represent. However, a great advantage of the colormap is, that it already contains the shading and shadows. The Voxel Space engine just takes the color and doesn't have to compute illumination during the render process.
 
 ### Basic algorithm
 The algorithm draws just vertical lines. The following figure demonstrate this technique.
@@ -35,10 +35,10 @@ The algorithm draws just vertical lines. The following figure demonstrate this t
 ![Line by line](images/linebyline.gif)
 
  * Clear Screen.
- * For visible surface determination start from the back and render to the front
+ * For visible surface determination start from the back and render to the front.
  * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#) (Objects are smaller farther away)
- * Segment the line so that it matches the number of columns of the screen.
- * Load the height and color from the 2D maps corresponding of the segment of the line.
+ * Raster the line so that it matches the number of columns of the screen.
+ * Retrieve the height and color from the 2D maps corresponding of the segment of the line.
  * Perform the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#) for the height coordinate.
  * Draw a vertical line with the corresponding color with the height retrieved from the perspective correction.
 
@@ -50,7 +50,7 @@ def Render(p, height, horizon, scale_height, distance, screen_width, screen_heig
     for z in range(distance, 1, -1):
         # Find line on map. This calculation corresponds to a field of view of 90°
         pleft  = Point(-z + p.x, -z + p.y)
-        pright = Point( z + p.x, -z + p.y)        
+        pright = Point( z + p.x, -z + p.y)
         # segment the line
         dx = (pright.x - pleft.x) / screen_width
         # Draw vertical line for each segment
@@ -106,13 +106,12 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
 Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 ```
 
-
 ### More performance
 
 There are of course a lot of tricks to achieve higher performance.
 
-* Instead of drawing from back to the front we can draw from front to back. The advantage is, the we don't have to draw lines to the bootom of the screen. However, you need more logic for the visibility calcuation
-* Render more details in front but less details far away
+* Instead of drawing from back to the front we can draw from front to back. The advantage is, the we don't have to draw lines to the bootom of the screen every time. This part can be done via a y-buffer. For every column, the highest y position is stored. Because we are drawing from the front to back, the visible part of the next line can only be larger then the highest line previously drawn.
+* Level of Detail. Render more details in front but less details far away. 
 
 ![front to back rendering](images/fronttoback.gif)
 
@@ -123,9 +122,9 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
     var cosphi = math.cos(phi);
     
     # initialize visibility array. Y position for each column on screen 
-    hidden = np.zeros(screen_width)
+    ybuffer = np.zeros(screen_width)
     for i in range(0, screen_width):
-        hidden[i] = screen_height
+        ybuffer[i] = screen_height
 
     # Draw from front to the back (low z coordinate to high z coordinate)
     dz = 1.
@@ -138,7 +137,7 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
         pright = Point(
             ( cosphi*z - sinphi*z) + p.x,
             (-sinphi*z - cosphi*z) + p.y)
-        
+
         # segment the line
         dx = (pright.x - pleft.x) / screen_width
         dy = (pright.y - pleft.y) / screen_width
@@ -146,12 +145,12 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
         # Draw vertical line for each segment
         for i in range(0, screen_width):
             height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
-            DrawVerticalLine(i, height_on_screen, hidden[i], colormap[pleft.x, pleft.y])
-            if height_on_screen < hidden[i]:
-                hidden[i] = heightonscreen            
+            DrawVerticalLine(i, height_on_screen, ybuffer[i], colormap[pleft.x, pleft.y])
+            if height_on_screen < ybuffer[i]:
+                ybuffer[i] = heightonscreen
             p1eft.x += dx
             p1eft.y += dy
-            
+
         # Go to next line and increase step size when you are far away
         z += dz
         dz += 0.2
