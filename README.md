@@ -53,25 +53,39 @@ def Render(p, height, horizon, scale_height, distance, screen_width):
                 colormap[pleft.x, pleft.y])
             p1eft.x += dx
             
-# call the drawing function with position, height, horizon line position, 
+# Call the drawing function with the camera parameters:
+# position, height, horizon line position, 
 # scaling factor for the height, the largest distance, and the screen width parameter
 Render( Point(0, 0), 50, 120, 120, 300, 700 )
 ```
 
 ### Add rotation
 
+With the algorithm above we can only view to the north. A different angle needs a few more lines of code to rotate the coordinates.
+
 ![rotation](images/rotate.gif)
 
 ```python
-def Render(p, height, horizon, scale_height, distance, screen_width):
+def Render(p, phi, height, horizon, scale_height, distance, screen_width):
+    # precalculate viewing angle parameters
+    var sinphi = math.sin(phi);
+    var cosphi = math.cos(phi);
+
     # Draw from back to the front (high z coordinate to low z coordinate)
     for z in range(distance, 1, -1):
+
         # Find line on map. This calculation corresponds to a field of view of 90°
-        pleft = Point(-z + p.x, -z + p.y)
-        pright = Point( z + p.x, -z + p.y)        
+        pleft = Point(
+            (-cosphi*z - sinphi*z) + p.x,
+            ( sinphi*z - cosphi*z) + p.y)
+        pright = Point(
+            ( cosphi*z - sinphi*z) + p.x,
+            (-sinphi*z - cosphi*z) + p.y)
+        
         # segment the line
         dx = (pright.x - pleft.x) / screen_width
         dy = (pright.y - pleft.y) / screen_width
+
         # Draw vertical line for each segment
         for i in range(0, screen_width):
             DrawVerticalLine(i, 
@@ -79,16 +93,17 @@ def Render(p, height, horizon, scale_height, distance, screen_width):
                 colormap[pleft.x, pleft.y])
             p1eft.x += dx
             p1eft.y += dy
-            
-# call the drawing function with position, height, horizon line position, 
+
+# Call the drawing function with the camera parameters:
+# position, viewing angle, height, horizon line position, 
 # scaling factor for the height, the largest distance, and the screen width parameter
-Render( Point(0, 0), 50, 120, 120, 300, 700 )
+Render( Point(0, 0), 0, 50, 120, 120, 300, 700 )
 ```
 
 
 ### More performance
 
-There are of course a lot of tricks to get higher performance not mentioned here.
+There are of course a lot of tricks to get higher performance.
 
 ## Maps
 [color](maps/C1W.png),
