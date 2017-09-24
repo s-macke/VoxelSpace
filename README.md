@@ -1,7 +1,6 @@
 # Voxel Space
-Terrain rendering in less than 20 lines of code
 
-* [Project demo][project demo] page
+**Try the [web implementation][project demo] of the Voxel Space renderer**
 
 ## History
 
@@ -341,6 +340,8 @@ Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 ![C29W.png](images/thumbnails/C29W.png)
 ![D16.png](images/thumbnails/D16.png)
 
+# Project demo
 
+[Project demo][project demo] page
 
 [project demo]: https://s-macke.github.io/VoxelSpace/VoxelSpace.html
