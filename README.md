@@ -30,17 +30,17 @@ The easiest way to represent a terrain is through a height map and color map. Fo
 Such maps limit the terrain to "one height per position on the map" - Complex geometries such as buildings or trees are not possible to represent. However, a great advantage of the colormap is, that it already contains the shading and shadows. The Voxel Space engine just takes the color and doesn't have to compute illumination during the render process.
 
 ### Basic algorithm
-The algorithm draws just vertical lines. The following figure demonstrate this technique.
+For a 3D engine the rendering algorhtm is amazingly simple. The Voxel Space engine rasters the height and color map and draws vertical lines. The following figure demonstrate this technique.
 
 ![Line by line](images/linebyline.gif)
 
  * Clear Screen.
- * For visible surface determination start from the back and render to the front.
+ * To guarantee occlusion start from the back and render to the front. This is called painter algorithm.
  * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#) (Objects are smaller farther away)
  * Raster the line so that it matches the number of columns of the screen.
  * Retrieve the height and color from the 2D maps corresponding of the segment of the line.
  * Perform the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#) for the height coordinate.
- * Draw a vertical line with the corresponding color with the height retrieved from the perspective correction.
+ * Draw a vertical line with the corresponding color with the height retrieved from the perspective projection.
 
 The core algorithm contains in its simplest form only a few lines of code (python syntax):
 
@@ -53,15 +53,16 @@ def Render(p, height, horizon, scale_height, distance, screen_width, screen_heig
         pright = Point( z + p.x, -z + p.y)
         # segment the line
         dx = (pright.x - pleft.x) / screen_width
-        # Draw vertical line for each segment
+        # Raster line and draw a vertical line for each segment
         for i in range(0, screen_width):
             height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
             DrawVerticalLine(i, height_on_screen, screen_height, colormap[pleft.x, pleft.y])
             p1eft.x += dx
-            
+
 # Call the render function with the camera parameters:
-# position, height, horizon line position, 
-# scaling factor for the height, the largest distance, the screen width and the screen height parameter
+# position, height, horizon line position,
+# scaling factor for the height, the largest distance, 
+# screen width and the screen height parameter
 Render( Point(0, 0), 50, 120, 120, 300, 800, 600 )
 ```
 
@@ -92,7 +93,7 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
         dx = (pright.x - pleft.x) / screen_width
         dy = (pright.y - pleft.y) / screen_width
 
-        # Draw vertical line for each segment
+        # Raster line and draw a vertical line for each segment
         for i in range(0, screen_width):
             height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
             DrawVerticalLine(i, height_on_screen, screen_height, colormap[pleft.x, pleft.y])
@@ -102,7 +103,7 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
 # Call the render function with the camera parameters:
 # position, viewing angle, height, horizon line position, 
 # scaling factor for the height, the largest distance, 
-# the screen width and the screen height parameter
+# screen width and the screen height parameter
 Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 ```
 
@@ -110,7 +111,7 @@ Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 
 There are of course a lot of tricks to achieve higher performance.
 
-* Instead of drawing from back to the front we can draw from front to back. The advantage is, the we don't have to draw lines to the bootom of the screen every time. This part can be done via a y-buffer. For every column, the highest y position is stored. Because we are drawing from the front to back, the visible part of the next line can only be larger then the highest line previously drawn.
+* Instead of drawing from back to the front we can draw from front to back. The advantage is, the we don't have to draw lines to the bottom of the screen every time because of occlusion. However, to guarantee occlusion we need an additional y-buffer. For every column, the highest y position is stored. Because we are drawing from the front to back, the visible part of the next line can only be larger then the highest line previously drawn.
 * Level of Detail. Render more details in front but less details far away. 
 
 ![front to back rendering](images/fronttoback.gif)
@@ -142,7 +143,7 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
         dx = (pright.x - pleft.x) / screen_width
         dy = (pright.y - pleft.y) / screen_width
 
-        # Draw vertical line for each segment
+        # Raster line and draw a vertical line for each segment
         for i in range(0, screen_width):
             height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
             DrawVerticalLine(i, height_on_screen, ybuffer[i], colormap[pleft.x, pleft.y])
@@ -158,7 +159,7 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
 # Call the render function with the camera parameters:
 # position, viewing angle, height, horizon line position, 
 # scaling factor for the height, the largest distance, 
-# the screen width and the screen height parameter
+# screen width and the screen height parameter
 Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 ```
 
