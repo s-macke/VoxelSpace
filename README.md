@@ -1,5 +1,5 @@
 # Voxel Space
-Landscape rendering in less than 20 lines of code
+Terrain rendering in less than 20 lines of code
 
 * [Project demo][project demo] page
 
