@@ -7,10 +7,14 @@ Landscape rendering in less than 20 lines of code
 
 Let us go back to the year 1992. Processing power were 1000 times slower and acceleration via a GPU were unknown or unaffordable.
 3D games graphics used very simple rendering algorithms and showed mostly polyons with a simple color.
-![Game Gunship 2000 in 1991](images/gunship2000-1991.gif)
 
-It was during that year Novalogic published the game Comanche. 
+![Game Gunship 2000 in 1991](images/gunship2000-1991.gif)
+*Game Gunship 2000 published by MicroProse in 1991*
+
+It was during that year NovaLogic published the game Comanche.
+
 ![Game Comanche in 1992](images/comanche-1992.gif)
+*Game Comanche published by NovaLogic in 1992*
 
 The graphics were awesome and in my opinion 3-5 years ahead of its time. You see a lot more details, shading and even shadows. Of course the processing power didn't change.
 
