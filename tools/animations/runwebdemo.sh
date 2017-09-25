@@ -10,4 +10,4 @@ echo anim
 python anim.py
 
 echo convert
-gifsicle --colors 256 --optimize=2 --delay=10 --loop images/*.gif > anim.gif
+gifsicle --optimize=3 --scale=0.5 --delay=5 --loop images/*.gif > anim.gif
