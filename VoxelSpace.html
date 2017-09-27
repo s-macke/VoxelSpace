@@ -26,8 +26,8 @@
 
 <div id="info">
     Fly controls
-    <b>WASD</b> or <b>Cursor Keys</b> or <b>left click</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll </b>,  Mouse Navigation on,
-    &nbsp;&nbsp;&nbsp;
+    <b>WASD</b> or <b>Cursor Keys</b> or <b>left click</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll </b>,  
+    &nbsp;&nbsp;
 <select name="Mapselector" size="1" onchange="LoadMap(this.value);" value="C1W;D1">
 
 <option value="C1W;D1">Map C1W</option>
@@ -62,13 +62,21 @@
 <option value="C29W;D16">Map C29W</option>
 <option value="">Map Comanche 3</option>
 </select>
+<span>
+<label for="distancerange">Distance</label>
+<input id="distancerange" type="range" min="100" max="2000" step="1" onchange="camera.distance = this.value">
+</span>
 <a href="https://github.com/s-macke/VoxelSpace">Github project page</a>
+
+
 </div>
 
 
 <canvas id="myCanvas" width="800" height="400">
     Your browser does not support the canvas element.
 </canvas>
+
+
 
 <script>
 "use strict";
@@ -82,7 +90,8 @@ var camera =
     y: 800.,      // y position on the map
     height: 78.,  // height of the camera
     angle: 0.,    // direction of the camera
-    horizon: 100. // horizon position (look up and down)
+    horizon: 100.,// horizon position (look up and down)
+    distance: 800 // distance of map
 };
 
 // ---------------------------------------------
@@ -327,7 +336,7 @@ function Render()
     var dz = 1.;
 
     // Draw from front to back
-    for(var z=1; z<800; z+=dz)
+    for(var z=1; z<camera.distance; z+=dz)
     {
         // 90 degree field of view
         var plx =  -cosang * z - sinang * z;
