@@ -154,6 +154,10 @@ function UpdateCamera()
         camera.horizon -= 2;
         keypressed = true;
     }
+
+    // Collision detection. Don't fly below the surface.
+    var mapoffset = ((Math.floor(camera.y) & 1023) << 10) + (Math.floor(camera.x) & 1023)|0;
+    if ((heightmap[mapoffset]+10) > camera.height) camera.height = heightmap[mapoffset] + 10;
 }
 
 // ---------------------------------------------
