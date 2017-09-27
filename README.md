@@ -1,6 +1,8 @@
 # Voxel Space
 
-**Try the [web implementation][project demo] of the Voxel Space renderer**
+![web demonstration](images/webdemo.gif)
+
+**[Web Demo of the Voxel Space Engine][project demo]**
 
 ## History
 
