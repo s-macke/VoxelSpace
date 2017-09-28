@@ -12,9 +12,21 @@
         a { color: white; }
         #info {
             position: absolute;
-            top: 0px; width: 100%;
+            top: 0px;
+            width: 100%;
             padding: 5px;
             z-index:100;
+            color: white;
+            font-family: "Arial", Times, serif;
+            font-size: 120%;
+            }
+        #fps {
+            float: right;
+            position: absolute;
+            top: 0px;
+            right: 10px;
+            z-index:100;
+            padding: 5px;
             color: white;
             font-family: "Arial", Times, serif;
             font-size: 120%;
@@ -23,6 +35,10 @@
 </head>
 
 <body scroll="no">
+
+<div id="fps">
+</div>
+
 
 <div id="info">
     Fly controls
@@ -133,6 +149,11 @@ var input =
 var updaterunning = false;
 
 var time = new Date().getTime();
+
+
+// for fps display
+var timelastframe = new Date().getTime();
+var frames = 0;
 
 // Update the camera for next frame. Dependent on keypresses
 function UpdateCamera()
@@ -385,6 +406,7 @@ function Draw()
     DrawBackground();
     Render();
     Flip();
+    frames++;
 
     if (!input.keypressed)
     {
@@ -486,6 +508,14 @@ function Init()
     document.ontouchend   = DetectMouseUp;
     document.ontouchmove  = DetectMouseMove;
     window.onresize       = OnResizeWindow;
+
+    window.setInterval(function(){
+        var current = new Date().getTime();
+        document.getElementById('fps').innerText = (frames / (current-timelastframe) * 1000).toFixed(1) + " fps";
+        frames = 0;
+        timelastframe = current;
+    }, 2000);
+
 }
 
 Init();
