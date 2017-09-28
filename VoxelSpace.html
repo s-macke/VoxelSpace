@@ -27,9 +27,9 @@
 <div id="info">
     Fly controls
     <b>WASD</b> or <b>Cursor Keys</b> or <b>left click</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll </b>,  
-    &nbsp;&nbsp;
-<select name="Mapselector" size="1" onchange="LoadMap(this.value);" value="C1W;D1">
+<br>
 
+<select name="Mapselector" size="1" onchange="LoadMap(this.value);" value="C1W;D1">
 <option value="C1W;D1">Map C1W</option>
 <option value="C2W;D2">Map C2W</option>
 <option value="C3;D3">Map C3</option>
@@ -62,10 +62,10 @@
 <option value="C29W;D16">Map C29W</option>
 <option value="">Map Comanche 3</option>
 </select>
-<span>
+
 <label for="distancerange">Distance</label>
 <input id="distancerange" type="range" min="100" max="2000" step="1" onchange="camera.distance = this.value">
-</span>
+
 <a href="https://github.com/s-macke/VoxelSpace">Github project page</a>
 
 </div>
@@ -94,8 +94,11 @@ var camera =
 // ---------------------------------------------
 // Landscape data
 
-var heightmap = new Uint8Array(1024*1024); // 1024*1024 byte array with height information
-var colormap  = new Uint32Array(1024*1024); // 1024*1024 int array with RGB colors
+var map =
+{
+    height: new Uint8Array(1024*1024), // 1024*1024 byte array with height information
+    color:  new Uint32Array(1024*1024) // 1024*1024 int array with RGB colors
+};
 
 // ---------------------------------------------
 // Screen data
@@ -122,13 +125,12 @@ var input =
     leftright:       0,
     updown:          0,
     lookup:          false,
-    lookdown:        false
+    lookdown:        false,
+    mouseposition:   null,
+    keypressed:      false
 }
 
 var updaterunning = false;
-var keypressed = false;
-
-var mouseposition = null;
 
 var time = new Date().getTime();
 
@@ -137,37 +139,37 @@ function UpdateCamera()
 {
     var current = new Date().getTime();
 
-    keypressed = false;
+    input.keypressed = false;
     if (input.leftright != 0)
     {
         camera.angle += input.leftright*0.1*(current-time)*0.03;
-        keypressed = true;
+        input.keypressed = true;
     }
     if (input.forwardbackward != 0)
     {
         camera.x -= input.forwardbackward * Math.sin(camera.angle) * (current-time)*0.03;
         camera.y -= input.forwardbackward * Math.cos(camera.angle) * (current-time)*0.03;
-        keypressed = true;
+        input.keypressed = true;
     }
     if (input.updown != 0)
     {
         camera.height += input.updown * (current-time)*0.03;
-        keypressed = true;
+        input.keypressed = true;
     }
     if (input.lookup)
     {
         camera.horizon += 2 * (current-time)*0.03;
-        keypressed = true;
+        input.keypressed = true;
     }
     if (input.lookdown)
     {
         camera.horizon -= 2 * (current-time)*0.03;
-        keypressed = true;
+        input.keypressed = true;
     }
 
     // Collision detection. Don't fly below the surface.
     var mapoffset = ((Math.floor(camera.y) & 1023) << 10) + (Math.floor(camera.x) & 1023)|0;
-    if ((heightmap[mapoffset]+10) > camera.height) camera.height = heightmap[mapoffset] + 10;
+    if ((map.height[mapoffset]+10) > camera.height) camera.height = map.height[mapoffset] + 10;
 
     time = current;
 
@@ -179,7 +181,7 @@ function UpdateCamera()
 function DetectMouseDown(e)
 {
     input.forwardbackward = 3.;
-    mouseposition = [e.pageX, e.pageY];
+    input.mouseposition = [e.pageX, e.pageY];
     time = new Date().getTime();
 
     if (!updaterunning) Draw();
@@ -188,7 +190,7 @@ function DetectMouseDown(e)
 
 function DetectMouseUp()
 {
-    mouseposition = null;
+    input.mouseposition = null;
     input.forwardbackward = 0;
     input.leftright = 0;
     input.updown = 0;
@@ -198,12 +200,12 @@ function DetectMouseUp()
 function DetectMouseMove(e)
 {
     e.preventDefault();
-    if (mouseposition == null) return;
+    if (input.mouseposition == null) return;
     if (input.forwardbackward == 0) return;
 
-    input.leftright = (mouseposition[0]-e.pageX)*1e-3;
-    camera.horizon = 100 + (mouseposition[1]-e.pageY)*0.5;
-    input.updown = (mouseposition[1]-e.pageY)*1e-2;
+    input.leftright = (input.mouseposition[0]-e.pageX)*1e-3;
+    camera.horizon  = 100 + (input.mouseposition[1]-e.pageY)*0.5;
+    input.updown    = (input.mouseposition[1]-e.pageY)*1e-2;
 }
 
 
@@ -362,8 +364,8 @@ function Render()
         for(var i=0; i<screenwidth|0; i=i+1|0)
         {
             var mapoffset = ((Math.floor(ply) & 1023) << 10) + (Math.floor(plx) & 1023)|0;
-            var heightonscreen = (camera.height - heightmap[mapoffset]) * invz + camera.horizon|0;
-            DrawVerticalLine(i, heightonscreen, hiddeny[i], colormap[mapoffset]);
+            var heightonscreen = (camera.height - map.height[mapoffset]) * invz + camera.horizon|0;
+            DrawVerticalLine(i, heightonscreen, hiddeny[i], map.color[mapoffset]);
             if (heightonscreen < hiddeny[i]) hiddeny[i] = heightonscreen;
             plx += dx;
             ply += dy;
@@ -384,7 +386,7 @@ function Draw()
     Render();
     Flip();
 
-    if (!keypressed)
+    if (!input.keypressed)
     {
         updaterunning = false;
     } else
@@ -436,8 +438,8 @@ function OnLoadedImages(result)
     var datah = result[1];
     for(var i=0; i<1024*1024; i++)
     {
-        colormap[i] = 0xFF000000 | (datac[(i<<2) + 2] << 16) | (datac[(i<<2) + 1] << 8) | datac[(i<<2) + 0];
-        heightmap[i] = datah[i<<2];
+        map.color[i] = 0xFF000000 | (datac[(i<<2) + 2] << 16) | (datac[(i<<2) + 1] << 8) | datac[(i<<2) + 0];
+        map.height[i] = datah[i<<2];
     }
     Draw();
 }
@@ -467,8 +469,8 @@ function Init()
 {
     for(var i=0; i<1024*1024; i++)
     {
-        colormap[i] = 0xFF007050;
-        heightmap[i] = 0;
+        map.color[i] = 0xFF007050;
+        map.height[i] = 0;
     }
 
     LoadMap("C1W;D1");
