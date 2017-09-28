@@ -116,11 +116,14 @@ var screen =
 // ---------------------------------------------
 // Keyboard and mouse interaction
 
-var kforwardbackward = 0;
-var kleftright = 0;
-var kupdown = 0;
-var klookup = false;
-var klookdown = false;
+var input =
+{
+    forwardbackward: 0,
+    leftright:       0,
+    updown:          0,
+    lookup:          false,
+    lookdown:        false
+}
 
 var updaterunning = false;
 var keypressed = false;
@@ -133,32 +136,32 @@ var time = new Date().getTime();
 function UpdateCamera()
 {
     var current = new Date().getTime();
-    console.log(current-time);
+
     keypressed = false;
-    if (kleftright != 0)
+    if (input.leftright != 0)
     {
-        camera.angle += kleftright*0.1*(current-time)*0.1;
+        camera.angle += input.leftright*0.1*(current-time)*0.03;
         keypressed = true;
     }
-    if (kforwardbackward != 0)
+    if (input.forwardbackward != 0)
     {
-        camera.x -= kforwardbackward * Math.sin(camera.angle) * (current-time)*0.1;
-        camera.y -= kforwardbackward * Math.cos(camera.angle) * (current-time)*0.1;
+        camera.x -= input.forwardbackward * Math.sin(camera.angle) * (current-time)*0.03;
+        camera.y -= input.forwardbackward * Math.cos(camera.angle) * (current-time)*0.03;
         keypressed = true;
     }
-    if (kupdown != 0)
+    if (input.updown != 0)
     {
-        camera.height += kupdown * (current-time)*0.1;
+        camera.height += input.updown * (current-time)*0.03;
         keypressed = true;
     }
-    if (klookup)
+    if (input.lookup)
     {
-        camera.horizon += 2 * (current-time)*0.1;
+        camera.horizon += 2 * (current-time)*0.03;
         keypressed = true;
     }
-    if (klookdown)
+    if (input.lookdown)
     {
-        camera.horizon -= 2 * (current-time)*0.1;
+        camera.horizon -= 2 * (current-time)*0.03;
         keypressed = true;
     }
 
@@ -175,7 +178,7 @@ function UpdateCamera()
 
 function DetectMouseDown(e)
 {
-    kforwardbackward = 3.;
+    input.forwardbackward = 3.;
     mouseposition = [e.pageX, e.pageY];
     time = new Date().getTime();
 
@@ -186,9 +189,9 @@ function DetectMouseDown(e)
 function DetectMouseUp()
 {
     mouseposition = null;
-    kforwardbackward = 0;
-    kleftright = 0;
-    kupdown = 0;
+    input.forwardbackward = 0;
+    input.leftright = 0;
+    input.updown = 0;
     return;
 }
 
@@ -196,11 +199,11 @@ function DetectMouseMove(e)
 {
     e.preventDefault();
     if (mouseposition == null) return;
-    if (kforwardbackward == 0) return;
+    if (input.forwardbackward == 0) return;
 
-    kleftright = (mouseposition[0]-e.pageX)*1e-3;
+    input.leftright = (mouseposition[0]-e.pageX)*1e-3;
     camera.horizon = 100 + (mouseposition[1]-e.pageY)*0.5;
-    kupdown = (mouseposition[1]-e.pageY)*1e-2;
+    input.updown = (mouseposition[1]-e.pageY)*1e-2;
 }
 
 
@@ -210,31 +213,31 @@ function DetectKeysDown(e)
     {
     case 37:    // left cursor
     case 65:    // a
-        kleftright = +1.;
+        input.leftright = +1.;
         break;
     case 39:    // right cursor
     case 68:    // d
-        kleftright = -1.;
+        input.leftright = -1.;
         break;
     case 38:    // cursor up
     case 87:    // w
-        kforwardbackward = 3.;
+        input.forwardbackward = 3.;
         break;
     case 40:    // cursor down
     case 83:    // s
-        kforwardbackward = -3.;
+        input.forwardbackward = -3.;
         break;
     case 82:    // r
-        kupdown = +2.;
+        input.updown = +2.;
         break;
     case 70:    // f
-        kupdown = -2.;
+        input.updown = -2.;
         break;
     case 69:    // e
-        klookup = true;
+        input.lookup = true;
         break;
     case 81:    //q
-        klookdown = true;
+        input.lookdown = true;
         break;
     default:
         return;
@@ -254,31 +257,31 @@ function DetectKeysUp(e)
     {
     case 37:    // left cursor
     case 65:    // a
-        kleftright = 0;
+        input.leftright = 0;
         break;
     case 39:    // right cursor
     case 68:    // d
-        kleftright = 0;
+        input.leftright = 0;
         break;
     case 38:    // cursor up
     case 87:    // w
-        kforwardbackward = 0;
+        input.forwardbackward = 0;
         break;
     case 40:    // cursor down
     case 83:    // s
-        kforwardbackward = 0;
+        input.forwardbackward = 0;
         break;
     case 82:    // r
-        kupdown = 0;
+        input.updown = 0;
         break;
     case 70:    // f
-        kupdown = 0;
+        input.updown = 0;
         break;
     case 69:    // e
-        klookup = false;
+        input.lookup = false;
         break;
     case 81:    //q
-        klookdown = false;
+        input.lookdown = false;
         break;
     default:
         return;
