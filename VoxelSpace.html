@@ -68,14 +68,11 @@
 </span>
 <a href="https://github.com/s-macke/VoxelSpace">Github project page</a>
 
-
 </div>
-
 
 <canvas id="myCanvas" width="800" height="400">
     Your browser does not support the canvas element.
 </canvas>
-
 
 
 <script>
@@ -86,12 +83,12 @@
 
 var camera =
 {
-    x: 512.,      // x position on the map
-    y: 800.,      // y position on the map
-    height: 78.,  // height of the camera
-    angle: 0.,    // direction of the camera
-    horizon: 100.,// horizon position (look up and down)
-    distance: 800 // distance of map
+    x:        512., // x position on the map
+    y:        800., // y position on the map
+    height:    78., // height of the camera
+    angle:      0., // direction of the camera
+    horizon:  100., // horizon position (look up and down)
+    distance: 800   // distance of map
 };
 
 // ---------------------------------------------
@@ -103,20 +100,23 @@ var colormap  = new Uint32Array(1024*1024); // 1024*1024 int array with RGB colo
 // ---------------------------------------------
 // Screen data
 
-var bufarray = null; // color data
-var buf8 = null;     // the same array but with bytes
-var buf32 = null;    // the same array but with 32-Bit words
+var screen =
+{
+    canvas:    null,
+    context:   null,
+    imagedata: null,
 
-var canvas = null;
-var context = null;
-var imagedata = null;
+    bufarray:  null, // color data
+    buf8:      null, // the same array but with bytes
+    buf32:     null, // the same array but with 32-Bit words
 
+    backgroundcolor: 0xFFE09090
+};
 
 // ---------------------------------------------
 // Keyboard and mouse interaction
 
-var kforward = false;
-var kbackward = false;
+var kforwardbackward = 0;
 var kleftright = 0;
 var kupdown = 0;
 var klookup = false;
@@ -127,46 +127,47 @@ var keypressed = false;
 
 var mouseposition = null;
 
+var time = new Date().getTime();
+
 // Update the camera for next frame. Dependent on keypresses
 function UpdateCamera()
 {
+    var current = new Date().getTime();
+    console.log(current-time);
     keypressed = false;
     if (kleftright != 0)
     {
-        camera.angle += kleftright*0.1;
+        camera.angle += kleftright*0.1*(current-time)*0.1;
         keypressed = true;
     }
-    if (kforward)
+    if (kforwardbackward != 0)
     {
-        camera.x -= 3. * Math.sin(camera.angle);
-        camera.y -= 3. * Math.cos(camera.angle);
-        keypressed = true;
-    }
-    if (kbackward)
-    {
-        camera.x += 3. * Math.sin(camera.angle);
-        camera.y += 3. * Math.cos(camera.angle);
+        camera.x -= kforwardbackward * Math.sin(camera.angle) * (current-time)*0.1;
+        camera.y -= kforwardbackward * Math.cos(camera.angle) * (current-time)*0.1;
         keypressed = true;
     }
     if (kupdown != 0)
     {
-        camera.height += kupdown;
+        camera.height += kupdown * (current-time)*0.1;
         keypressed = true;
     }
     if (klookup)
     {
-        camera.horizon += 2;
+        camera.horizon += 2 * (current-time)*0.1;
         keypressed = true;
     }
     if (klookdown)
     {
-        camera.horizon -= 2;
+        camera.horizon -= 2 * (current-time)*0.1;
         keypressed = true;
     }
 
     // Collision detection. Don't fly below the surface.
     var mapoffset = ((Math.floor(camera.y) & 1023) << 10) + (Math.floor(camera.x) & 1023)|0;
     if ((heightmap[mapoffset]+10) > camera.height) camera.height = heightmap[mapoffset] + 10;
+
+    time = current;
+
 }
 
 // ---------------------------------------------
@@ -174,8 +175,9 @@ function UpdateCamera()
 
 function DetectMouseDown(e)
 {
-    kforward = true;
+    kforwardbackward = 3.;
     mouseposition = [e.pageX, e.pageY];
+    time = new Date().getTime();
 
     if (!updaterunning) Draw();
     return;
@@ -184,7 +186,7 @@ function DetectMouseDown(e)
 function DetectMouseUp()
 {
     mouseposition = null;
-    kforward = false;
+    kforwardbackward = 0;
     kleftright = 0;
     kupdown = 0;
     return;
@@ -194,10 +196,10 @@ function DetectMouseMove(e)
 {
     e.preventDefault();
     if (mouseposition == null) return;
-    if (kforward == false) return;
+    if (kforwardbackward == 0) return;
 
     kleftright = (mouseposition[0]-e.pageX)*1e-3;
-    camera.horizon=100 + (mouseposition[1]-e.pageY)*0.5;
+    camera.horizon = 100 + (mouseposition[1]-e.pageY)*0.5;
     kupdown = (mouseposition[1]-e.pageY)*1e-2;
 }
 
@@ -208,25 +210,25 @@ function DetectKeysDown(e)
     {
     case 37:    // left cursor
     case 65:    // a
-        kleftright = +1;
+        kleftright = +1.;
         break;
     case 39:    // right cursor
     case 68:    // d
-        kleftright = -1;
+        kleftright = -1.;
         break;
     case 38:    // cursor up
     case 87:    // w
-        kforward = true;
+        kforwardbackward = 3.;
         break;
     case 40:    // cursor down
     case 83:    // s
-        kbackward = true;
+        kforwardbackward = -3.;
         break;
     case 82:    // r
-        kupdown = +2;
+        kupdown = +2.;
         break;
     case 70:    // f
-        kupdown = -2;
+        kupdown = -2.;
         break;
     case 69:    // e
         klookup = true;
@@ -239,7 +241,10 @@ function DetectKeysDown(e)
         break;
     }
 
-    if (!updaterunning) Draw();
+    if (!updaterunning) {
+        time = new Date().getTime();
+        Draw();
+    }
     return false;
 }
 
@@ -257,11 +262,11 @@ function DetectKeysUp(e)
         break;
     case 38:    // cursor up
     case 87:    // w
-        kforward = false;
+        kforwardbackward = 0;
         break;
     case 40:    // cursor down
     case 83:    // s
-        kbackward = false;
+        kforwardbackward = 0;
         break;
     case 82:    // r
         kupdown = 0;
@@ -291,7 +296,8 @@ function DrawVerticalLine(x, ytop, ybottom, col)
     ytop = ytop|0;
     ybottom = ybottom|0;
     col = col|0;
-    var screenwidth = canvas.width|0;
+    var buf32 = screen.buf32;
+    var screenwidth = screen.canvas.width|0;
     if (ytop < 0) ytop = 0;
     if (ytop > ybottom) return;
 
@@ -309,15 +315,16 @@ function DrawVerticalLine(x, ytop, ybottom, col)
 
 function DrawBackground()
 {
-    var color = 0xFFE09090;
+    var buf32 = screen.buf32;
+    var color = screen.backgroundcolor|0;
     for (var i = 0; i < buf32.length; i++) buf32[i] = color|0;
 }
 
 // Show the back buffer on screen
 function Flip()
 {
-    imagedata.data.set(buf8);
-    context.putImageData(imagedata, 0, 0);
+    screen.imagedata.data.set(screen.buf8);
+    screen.context.putImageData(screen.imagedata, 0, 0);
 }
 
 // ---------------------------------------------
@@ -325,13 +332,13 @@ function Flip()
 
 function Render()
 {
-    var screenwidth = canvas.width|0;
+    var screenwidth = screen.canvas.width|0;
     var sinang = Math.sin(camera.angle);
     var cosang = Math.cos(camera.angle);
 
     var hiddeny = new Int32Array(screenwidth);
-    for(var i=0; i<canvas.width|0; i=i+1|0)
-        hiddeny[i] = canvas.height;
+    for(var i=0; i<screen.canvas.width|0; i=i+1|0)
+        hiddeny[i] = screen.canvas.height;
 
     var dz = 1.;
 
@@ -434,22 +441,22 @@ function OnLoadedImages(result)
 
 function OnResizeWindow()
 {
-    canvas = document.getElementById('myCanvas');
+    screen.canvas = document.getElementById('myCanvas');
 
     var aspect = window.innerWidth / window.innerHeight;
 
-    canvas.width = window.innerWidth<800?window.innerWidth:800;
-    canvas.height = canvas.width / aspect;
+    screen.canvas.width = window.innerWidth<800?window.innerWidth:800;
+    screen.canvas.height = screen.canvas.width / aspect;
 
-    if (canvas.getContext)
+    if (screen.canvas.getContext)
     {
-        context = canvas.getContext('2d');
-        imagedata = context.createImageData(canvas.width, canvas.height);
+        screen.context = screen.canvas.getContext('2d');
+        screen.imagedata = screen.context.createImageData(screen.canvas.width, screen.canvas.height);
     }
 
-    bufarray = new ArrayBuffer(imagedata.width*imagedata.height*4);
-    buf8 = new Uint8Array(bufarray);
-    buf32 = new Uint32Array(bufarray);
+    screen.bufarray = new ArrayBuffer(screen.imagedata.width * screen.imagedata.height * 4);
+    screen.buf8     = new Uint8Array(screen.bufarray);
+    screen.buf32    = new Uint32Array(screen.bufarray);
     Draw();
 }
 
