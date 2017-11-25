@@ -31,7 +31,7 @@ The easiest way to represent a terrain is through a height map and color map. Fo
 Such maps limit the terrain to "one height per position on the map" - Complex geometries such as buildings or trees are not possible to represent. However, a great advantage of the colormap is, that it already contains the shading and shadows. The Voxel Space engine just takes the color and doesn't have to compute illumination during the render process.
 
 ### Basic algorithm
-For a 3D engine the rendering algorhtm is amazingly simple. The Voxel Space engine rasters the height and color map and draws vertical lines. The following figure demonstrate this technique.
+For a 3D engine the rendering algorithm is amazingly simple. The Voxel Space engine rasters the height and color map and draws vertical lines. The following figure demonstrate this technique.
 
 ![Line by line](images/linebyline.gif)
 
