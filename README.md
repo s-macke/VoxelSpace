@@ -37,10 +37,10 @@ For a 3D engine the rendering algorithm is amazingly simple. The Voxel Space eng
 
  * Clear Screen.
  * To guarantee occlusion start from the back and render to the front. This is called painter algorithm.
- * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#) (Objects are smaller farther away)
+ * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#Perspective_projection) (Objects are smaller farther away)
  * Raster the line so that it matches the number of columns of the screen.
  * Retrieve the height and color from the 2D maps corresponding of the segment of the line.
- * Perform the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#) for the height coordinate.
+ * Perform the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#Perspective_projection) for the height coordinate.
  * Draw a vertical line with the corresponding color with the height retrieved from the perspective projection.
 
 The core algorithm contains in its simplest form only a few lines of code (python syntax):
