@@ -357,6 +357,6 @@ Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 
 ## License
 
-The software part of the repository is under the MIT license. Please read the license file for more information. Please keep in mind, that the Voxel Space technology might be still [patented](https://patents.justia.com/assignee/novalogic-inc) in some countries. The color and height maps are reverse engineered from the game Comanche are therefore excluded from the license.
+The software part of the repository is under the MIT license. Please read the license file for more information. Please keep in mind, that the Voxel Space technology might be still [patented](https://patents.justia.com/assignee/novalogic-inc) in some countries. The color and height maps are reverse engineered from the game Comanche and are therefore excluded from the license.
 
 [project demo]: https://s-macke.github.io/VoxelSpace/VoxelSpace.html
