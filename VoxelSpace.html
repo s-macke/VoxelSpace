@@ -223,9 +223,9 @@ function DetectMouseMove(e)
     if (input.mouseposition == null) return;
     if (input.forwardbackward == 0) return;
 
-    input.leftright = (input.mouseposition[0]-e.pageX)*1e-3;
-    camera.horizon  = 100 + (input.mouseposition[1]-e.pageY)*0.5;
-    input.updown    = (input.mouseposition[1]-e.pageY)*1e-2;
+    input.leftright = (input.mouseposition[0]-e.pageX) / window.innerWidth * 2;
+    camera.horizon  = 100 + (input.mouseposition[1]-e.pageY) / window.innerHeight * 500;
+    input.updown    = (input.mouseposition[1]-e.pageY) / window.innerHeight * 10;
 }
 
 
@@ -385,7 +385,7 @@ function Render()
         {
             var mapoffset = ((Math.floor(ply) & 1023) << 10) + (Math.floor(plx) & 1023)|0;
             var heightonscreen = (camera.height - map.height[mapoffset]) * invz + camera.horizon|0;
-            DrawVerticalLine(i, heightonscreen, hiddeny[i], map.color[mapoffset]);
+            DrawVerticalLine(i, heightonscreen|0, hiddeny[i], map.color[mapoffset]);
             if (heightonscreen < hiddeny[i]) hiddeny[i] = heightonscreen;
             plx += dx;
             ply += dy;
