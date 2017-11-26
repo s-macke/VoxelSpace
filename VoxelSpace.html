@@ -197,11 +197,26 @@ function UpdateCamera()
 
 // ---------------------------------------------
 // Keyboard and mouse event handlers
+// ---------------------------------------------
+// Keyboard and mouse event handlers
+
+function GetMousePosition(e)
+{
+    // fix for Chrome
+    if (isNaN(e.pageX))
+    {
+        return [e.targetTouches[0].pageX, e.targetTouches[0].pageY];
+    } else
+    {
+        return [e.pageX, e.pageY];
+    }
+}
+
 
 function DetectMouseDown(e)
 {
     input.forwardbackward = 3.;
-    input.mouseposition = [e.pageX, e.pageY];
+    input.mouseposition = GetMousePosition(e);
     time = new Date().getTime();
 
     if (!updaterunning) Draw();
@@ -223,9 +238,11 @@ function DetectMouseMove(e)
     if (input.mouseposition == null) return;
     if (input.forwardbackward == 0) return;
 
-    input.leftright = (input.mouseposition[0]-e.pageX) / window.innerWidth * 2;
-    camera.horizon  = 100 + (input.mouseposition[1]-e.pageY) / window.innerHeight * 500;
-    input.updown    = (input.mouseposition[1]-e.pageY) / window.innerHeight * 10;
+    var currentMousePosition = GetMousePosition(e);
+
+    input.leftright = (input.mouseposition[0] - currentMousePosition[0]) / window.innerWidth * 2;
+    camera.horizon  = 100 + (input.mouseposition[1] - currentMousePosition[1]) / window.innerHeight * 500;
+    input.updown    = (input.mouseposition[1] - currentMousePosition[1]) / window.innerHeight * 10;
 }
 
 
