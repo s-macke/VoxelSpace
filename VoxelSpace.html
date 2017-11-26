@@ -203,7 +203,7 @@ function UpdateCamera()
 function GetMousePosition(e)
 {
     // fix for Chrome
-    if (isNaN(e.pageX))
+    if (e.type.startsWith('touch'))
     {
         return [e.targetTouches[0].pageX, e.targetTouches[0].pageY];
     } else
