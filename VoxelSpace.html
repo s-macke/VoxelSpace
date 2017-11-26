@@ -441,7 +441,7 @@ function DownloadImagesAsync(urls, OnSuccess) {
     var pending = urls.length;
     var result = [];
     if (pending === 0) {
-        setTimeout(onsuccess.bind(null, result), 0);
+        setTimeout(OnSuccess.bind(null, result), 0);
         return;
     }
     urls.forEach(function(url, i) {
