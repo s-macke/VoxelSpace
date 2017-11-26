@@ -31,16 +31,16 @@ The easiest way to represent a terrain is through a height map and color map. Fo
 Such maps limit the terrain to "one height per position on the map" - Complex geometries such as buildings or trees are not possible to represent. However, a great advantage of the colormap is, that it already contains the shading and shadows. The Voxel Space engine just takes the color and doesn't have to compute illumination during the render process.
 
 ### Basic algorithm
-For a 3D engine the rendering algorhtm is amazingly simple. The Voxel Space engine rasters the height and color map and draws vertical lines. The following figure demonstrate this technique.
+For a 3D engine the rendering algorithm is amazingly simple. The Voxel Space engine rasters the height and color map and draws vertical lines. The following figure demonstrate this technique.
 
 ![Line by line](images/linebyline.gif)
 
  * Clear Screen.
  * To guarantee occlusion start from the back and render to the front. This is called painter algorithm.
- * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#) (Objects are smaller farther away)
+ * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#Perspective_projection) (Objects are smaller farther away)
  * Raster the line so that it matches the number of columns of the screen.
  * Retrieve the height and color from the 2D maps corresponding of the segment of the line.
- * Perform the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#) for the height coordinate.
+ * Perform the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#Perspective_projection) for the height coordinate.
  * Draw a vertical line with the corresponding color with the height retrieved from the perspective projection.
 
 The core algorithm contains in its simplest form only a few lines of code (python syntax):
@@ -355,7 +355,8 @@ Render( Point(0, 0), 0, 50, 120, 120, 300, 800, 600 )
 ![C29W.png](images/thumbnails/C29W.png)
 ![D16.png](images/thumbnails/D16.png)
 
+## License
 
-
+The software part of the repository is under the MIT license. Please read the license file for more information. Please keep in mind, that the Voxel Space technology might be still [patented](https://patents.justia.com/assignee/novalogic-inc) in some countries. The color and height maps are reverse engineered from the game Comanche and are therefore excluded from the license.
 
 [project demo]: https://s-macke.github.io/VoxelSpace/VoxelSpace.html
