@@ -42,7 +42,7 @@
 
 <div id="info">
     Fly controls
-    <b>WASD</b> or <b>Cursor Keys</b> or <b>left click</b> move, <b>R|F</b> up | down, <b>Q|E</b> pitch </b>,  
+    <b>WASD</b> or <b>Cursor Keys</b> or <b>left click</b> move, <b>R|F</b> up | down, <b>Q|E</b> pitch,
 <br>
 
 <select name="Mapselector" size="1" onchange="LoadMap(this.value);" value="C1W;D1">
@@ -121,7 +121,7 @@ var map =
 // ---------------------------------------------
 // Screen data
 
-var screen =
+var screendata =
 {
     canvas:    null,
     context:   null,
@@ -341,8 +341,8 @@ function DrawVerticalLine(x, ytop, ybottom, col)
     ytop = ytop|0;
     ybottom = ybottom|0;
     col = col|0;
-    var buf32 = screen.buf32;
-    var screenwidth = screen.canvas.width|0;
+    var buf32 = screendata.buf32;
+    var screenwidth = screendata.canvas.width|0;
     if (ytop < 0) ytop = 0;
     if (ytop > ybottom) return;
 
@@ -360,16 +360,16 @@ function DrawVerticalLine(x, ytop, ybottom, col)
 
 function DrawBackground()
 {
-    var buf32 = screen.buf32;
-    var color = screen.backgroundcolor|0;
+    var buf32 = screendata.buf32;
+    var color = screendata.backgroundcolor|0;
     for (var i = 0; i < buf32.length; i++) buf32[i] = color|0;
 }
 
 // Show the back buffer on screen
 function Flip()
 {
-    screen.imagedata.data.set(screen.buf8);
-    screen.context.putImageData(screen.imagedata, 0, 0);
+    screendata.imagedata.data.set(screendata.buf8);
+    screendata.context.putImageData(screendata.imagedata, 0, 0);
 }
 
 // ---------------------------------------------
@@ -380,13 +380,13 @@ function Render()
     var mapwidthperiod = map.width - 1;
     var mapheightperiod = map.height - 1;
 
-    var screenwidth = screen.canvas.width|0;
+    var screenwidth = screendata.canvas.width|0;
     var sinang = Math.sin(camera.angle);
     var cosang = Math.cos(camera.angle);
 
     var hiddeny = new Int32Array(screenwidth);
-    for(var i=0; i<screen.canvas.width|0; i=i+1|0)
-        hiddeny[i] = screen.canvas.height;
+    for(var i=0; i<screendata.canvas.width|0; i=i+1|0)
+        hiddeny[i] = screendata.canvas.height;
 
     var dz = 1.;
 
@@ -489,22 +489,22 @@ function OnLoadedImages(result)
 
 function OnResizeWindow()
 {
-    screen.canvas = document.getElementById('myCanvas');
+    screendata.canvas = document.getElementById('myCanvas');
 
     var aspect = window.innerWidth / window.innerHeight;
 
-    screen.canvas.width = window.innerWidth<800?window.innerWidth:800;
-    screen.canvas.height = screen.canvas.width / aspect;
+    screendata.canvas.width = window.innerWidth<800?window.innerWidth:800;
+    screendata.canvas.height = screendata.canvas.width / aspect;
 
-    if (screen.canvas.getContext)
+    if (screendata.canvas.getContext)
     {
-        screen.context = screen.canvas.getContext('2d');
-        screen.imagedata = screen.context.createImageData(screen.canvas.width, screen.canvas.height);
+        screendata.context = screendata.canvas.getContext('2d');
+        screendata.imagedata = screendata.context.createImageData(screendata.canvas.width, screendata.canvas.height);
     }
 
-    screen.bufarray = new ArrayBuffer(screen.imagedata.width * screen.imagedata.height * 4);
-    screen.buf8     = new Uint8Array(screen.bufarray);
-    screen.buf32    = new Uint32Array(screen.bufarray);
+    screendata.bufarray = new ArrayBuffer(screendata.imagedata.width * screendata.imagedata.height * 4);
+    screendata.buf8     = new Uint8Array(screendata.bufarray);
+    screendata.buf32    = new Uint32Array(screendata.bufarray);
     Draw();
 }
 
