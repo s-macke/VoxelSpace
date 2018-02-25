@@ -58,7 +58,7 @@ def Render(p, height, horizon, scale_height, distance, screen_width, screen_heig
         for i in range(0, screen_width):
             height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
             DrawVerticalLine(i, height_on_screen, screen_height, colormap[pleft.x, pleft.y])
-            p1eft.x += dx
+            pleft.x += dx
 
 # Call the render function with the camera parameters:
 # position, height, horizon line position,
@@ -98,8 +98,8 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
         for i in range(0, screen_width):
             height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
             DrawVerticalLine(i, height_on_screen, screen_height, colormap[pleft.x, pleft.y])
-            p1eft.x += dx
-            p1eft.y += dy
+            pleft.x += dx
+            pleft.y += dy
 
 # Call the render function with the camera parameters:
 # position, viewing angle, height, horizon line position, 
@@ -150,8 +150,8 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
             DrawVerticalLine(i, height_on_screen, ybuffer[i], colormap[pleft.x, pleft.y])
             if height_on_screen < ybuffer[i]:
                 ybuffer[i] = heightonscreen
-            p1eft.x += dx
-            p1eft.y += dy
+            pleft.x += dx
+            pleft.y += dy
 
         # Go to next line and increase step size when you are far away
         z += dz
