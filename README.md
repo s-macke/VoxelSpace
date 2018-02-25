@@ -149,7 +149,7 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
             height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
             DrawVerticalLine(i, height_on_screen, ybuffer[i], colormap[pleft.x, pleft.y])
             if height_on_screen < ybuffer[i]:
-                ybuffer[i] = heightonscreen
+                ybuffer[i] = height_on_screen
             pleft.x += dx
             pleft.y += dy
 
