@@ -386,10 +386,10 @@ function Render()
     for(var i=0; i<screendata.canvas.width|0; i=i+1|0)
         hiddeny[i] = screendata.canvas.height;
 
-    var dz = 1.;
+    var deltaz = 1.;
 
     // Draw from front to back
-    for(var z=1; z<camera.distance; z+=dz)
+    for(var z=1; z<camera.distance; z+=deltaz)
     {
         // 90 degree field of view
         var plx =  -cosang * z - sinang * z;
@@ -411,8 +411,8 @@ function Render()
             plx += dx;
             ply += dy;
         }
+        deltaz += 0.005;
     }
-    dz += 0.01;
 }
 
 
