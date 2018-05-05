@@ -39,7 +39,6 @@
 <div id="fps">
 </div>
 
-
 <div id="info">
     Fly controls
     <b>WASD</b> or <b>Cursor Keys</b> or <b>left click</b> move, <b>R|F</b> up | down, <b>Q|E</b> pitch,
@@ -85,10 +84,9 @@
 
 </div>
 
-<canvas id="myCanvas" width="800" height="400">
+<canvas id="fullscreenCanvas" width="800" height="400">
     Your browser does not support the canvas element.
 </canvas>
-
 
 <script>
 "use strict";
@@ -443,36 +441,39 @@ function Draw()
 // Init routines
 
 // Util class for downloading the png
-function DownloadImagesAsync(urls, OnSuccess) {
-    var pending = urls.length;
-    var result = [];
-    if (pending === 0) {
-        setTimeout(OnSuccess.bind(null, result), 0);
-        return;
-    }
-    urls.forEach(function(url, i) {
-        var image = new Image();
-        //image.addEventListener("load", function() {
-        image.onload = function() {
-            var tempcanvas = document.createElement("canvas");
-            var tempcontext = tempcanvas.getContext("2d");
-            tempcanvas.width = map.width;
-            tempcanvas.height = map.height;
-            tempcontext.drawImage(image, 0, 0, map.width, map.height);
-            result[i] = tempcontext.getImageData(0, 0, map.width, map.height).data;
-            pending--;
-            if (pending === 0) {
-                OnSuccess(result);
-            }
-        };
-        image.src = url;
+function DownloadImagesAsync(urls) {
+    return new Promise(function(resolve, reject) {
+
+        var pending = urls.length;
+        var result = [];
+        if (pending === 0) {
+            resolve([]);
+            return;
+        }
+        urls.forEach(function(url, i) {
+            var image = new Image();
+            //image.addEventListener("load", function() {
+            image.onload = function() {
+                var tempcanvas = document.createElement("canvas");
+                var tempcontext = tempcanvas.getContext("2d");
+                tempcanvas.width = map.width;
+                tempcanvas.height = map.height;
+                tempcontext.drawImage(image, 0, 0, map.width, map.height);
+                result[i] = tempcontext.getImageData(0, 0, map.width, map.height).data;
+                pending--;
+                if (pending === 0) {
+                    resolve(result);
+                }
+            };
+            image.src = url;
+        });
     });
 }
 
 function LoadMap(filenames)
 {
-   var files = filenames.split(";");
-   DownloadImagesAsync(["maps/"+files[0]+".png", "maps/"+files[1]+".png"], OnLoadedImages);
+    var files = filenames.split(";");
+    DownloadImagesAsync(["maps/"+files[0]+".png", "maps/"+files[1]+".png"]).then(OnLoadedImages);
 }
 
 function OnLoadedImages(result)
@@ -489,7 +490,7 @@ function OnLoadedImages(result)
 
 function OnResizeWindow()
 {
-    screendata.canvas = document.getElementById('myCanvas');
+    screendata.canvas = document.getElementById('fullscreenCanvas');
 
     var aspect = window.innerWidth / window.innerHeight;
 
@@ -520,14 +521,16 @@ function Init()
     OnResizeWindow();
 
     // set event handlers for keyboard, mouse, touchscreen and window resize
-    document.onkeydown    = DetectKeysDown;
-    document.onkeyup      = DetectKeysUp;
-    document.onmousedown  = DetectMouseDown;
-    document.onmouseup    = DetectMouseUp;
-    document.onmousemove  = DetectMouseMove;
-    document.ontouchstart = DetectMouseDown;
-    document.ontouchend   = DetectMouseUp;
-    document.ontouchmove  = DetectMouseMove;
+    var canvas = document.getElementById("fullscreenCanvas");
+    canvas.onkeydown    = DetectKeysDown;
+    canvas.onkeyup      = DetectKeysUp;
+    canvas.onmousedown  = DetectMouseDown;
+    canvas.onmouseup    = DetectMouseUp;
+    canvas.onmousemove  = DetectMouseMove;
+    canvas.ontouchstart = DetectMouseDown;
+    canvas.ontouchend   = DetectMouseUp;
+    canvas.ontouchmove  = DetectMouseMove;
+
     window.onresize       = OnResizeWindow;
 
     window.setInterval(function(){

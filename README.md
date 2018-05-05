@@ -37,10 +37,10 @@ For a 3D engine the rendering algorithm is amazingly simple. The Voxel Space eng
 
  * Clear Screen.
  * To guarantee occlusion start from the back and render to the front. This is called painter algorithm.
- * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#Perspective_projection) (Objects are smaller farther away)
+ * Determine the line on the map, which corresponds to the same optical distance from the observer. Consider the field of view and the [perspective projection](https://en.wikipedia.org/wiki/3D_projection) (Objects are smaller farther away)
  * Raster the line so that it matches the number of columns of the screen.
  * Retrieve the height and color from the 2D maps corresponding of the segment of the line.
- * Perform the [perspective projection](https://en.wikipedia.org/wiki/3D_projection#Perspective_projection) for the height coordinate.
+ * Perform the [perspective projection](https://en.wikipedia.org/wiki/3D_projection) for the height coordinate.
  * Draw a vertical line with the corresponding color with the height retrieved from the perspective projection.
 
 The core algorithm contains in its simplest form only a few lines of code (python syntax):
@@ -58,7 +58,7 @@ def Render(p, height, horizon, scale_height, distance, screen_width, screen_heig
         for i in range(0, screen_width):
             height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
             DrawVerticalLine(i, height_on_screen, screen_height, colormap[pleft.x, pleft.y])
-            p1eft.x += dx
+            pleft.x += dx
 
 # Call the render function with the camera parameters:
 # position, height, horizon line position,
@@ -98,8 +98,8 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
         for i in range(0, screen_width):
             height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
             DrawVerticalLine(i, height_on_screen, screen_height, colormap[pleft.x, pleft.y])
-            p1eft.x += dx
-            p1eft.y += dy
+            pleft.x += dx
+            pleft.y += dy
 
 # Call the render function with the camera parameters:
 # position, viewing angle, height, horizon line position, 
@@ -149,9 +149,9 @@ def Render(p, phi, height, horizon, scale_height, distance, screen_width, screen
             height_on_screen = (height - heightmap[pleft.x, pleft.y]) / z * scale_height. + horizon
             DrawVerticalLine(i, height_on_screen, ybuffer[i], colormap[pleft.x, pleft.y])
             if height_on_screen < ybuffer[i]:
-                ybuffer[i] = heightonscreen
-            p1eft.x += dx
-            p1eft.y += dy
+                ybuffer[i] = height_on_screen
+            pleft.x += dx
+            pleft.y += dy
 
         # Go to next line and increase step size when you are far away
         z += dz
