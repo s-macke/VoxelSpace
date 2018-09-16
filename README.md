@@ -2,7 +2,7 @@
 
 ![web demonstration](images/webdemo.gif)
 
-**[Web Demo of the Voxel Space Engine][project demo]**
+# **[Web Demo of the Voxel Space Engine][project demo]**
 
 ## History
 
