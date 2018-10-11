@@ -521,15 +521,14 @@ function Init()
     OnResizeWindow();
 
     // set event handlers for keyboard, mouse, touchscreen and window resize
-    var canvas = document.getElementById("fullscreenCanvas");
-    canvas.onkeydown    = DetectKeysDown;
-    canvas.onkeyup      = DetectKeysUp;
-    canvas.onmousedown  = DetectMouseDown;
-    canvas.onmouseup    = DetectMouseUp;
-    canvas.onmousemove  = DetectMouseMove;
-    canvas.ontouchstart = DetectMouseDown;
-    canvas.ontouchend   = DetectMouseUp;
-    canvas.ontouchmove  = DetectMouseMove;
+    window.onkeydown    = DetectKeysDown;
+    window.onkeyup      = DetectKeysUp;
+    window.onmousedown  = DetectMouseDown;
+    window.onmouseup    = DetectMouseUp;
+    window.onmousemove  = DetectMouseMove;
+    window.ontouchstart = DetectMouseDown;
+    window.ontouchend   = DetectMouseUp;
+    window.ontouchmove  = DetectMouseMove;
 
     window.onresize       = OnResizeWindow;
 
