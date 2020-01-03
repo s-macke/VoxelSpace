@@ -433,7 +433,7 @@ function Draw()
         updaterunning = false;
     } else
     {
-        window.setTimeout(Draw, 0);
+        window.requestAnimationFrame(Draw, 0);
     }
 }
 
@@ -522,8 +522,8 @@ function Init()
 
     // set event handlers for keyboard, mouse, touchscreen and window resize
     var canvas = document.getElementById("fullscreenCanvas");
-    canvas.onkeydown    = DetectKeysDown;
-    canvas.onkeyup      = DetectKeysUp;
+    window.onkeydown    = DetectKeysDown;
+    window.onkeyup      = DetectKeysUp;
     canvas.onmousedown  = DetectMouseDown;
     canvas.onmouseup    = DetectMouseUp;
     canvas.onmousemove  = DetectMouseMove;
