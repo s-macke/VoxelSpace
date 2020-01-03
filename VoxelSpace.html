@@ -386,10 +386,10 @@ function Render()
     for(var i=0; i<screendata.canvas.width|0; i=i+1|0)
         hiddeny[i] = screendata.canvas.height;
 
-    var dz = 1.;
+    var deltaz = 1.;
 
     // Draw from front to back
-    for(var z=1; z<camera.distance; z+=dz)
+    for(var z=1; z<camera.distance; z+=deltaz)
     {
         // 90 degree field of view
         var plx =  -cosang * z - sinang * z;
@@ -411,8 +411,8 @@ function Render()
             plx += dx;
             ply += dy;
         }
+        deltaz += 0.005;
     }
-    dz += 0.01;
 }
 
 
@@ -433,7 +433,7 @@ function Draw()
         updaterunning = false;
     } else
     {
-        window.setTimeout(Draw, 0);
+        window.requestAnimationFrame(Draw, 0);
     }
 }
 
@@ -522,8 +522,8 @@ function Init()
 
     // set event handlers for keyboard, mouse, touchscreen and window resize
     var canvas = document.getElementById("fullscreenCanvas");
-    canvas.onkeydown    = DetectKeysDown;
-    canvas.onkeyup      = DetectKeysUp;
+    window.onkeydown    = DetectKeysDown;
+    window.onkeyup      = DetectKeysUp;
     canvas.onmousedown  = DetectMouseDown;
     canvas.onmouseup    = DetectMouseUp;
     canvas.onmousemove  = DetectMouseMove;
