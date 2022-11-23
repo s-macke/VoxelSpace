@@ -80,6 +80,9 @@
 <label for="distancerange">Distance</label>
 <input id="distancerange" type="range" min="100" max="2000" step="1" onchange="camera.distance = this.value">
 
+<label for="bilinear">Bilinear</label>
+<input id="bilinear" type="checkbox" onchange="Draw()">
+
 <a href="https://github.com/s-macke/VoxelSpace">Github project page</a>
 
 </div>
@@ -371,7 +374,37 @@ function Flip()
 }
 
 // ---------------------------------------------
-// The main render routine
+// Interpolate between two RGB colors.
+
+function ColorInterp(a, b, t)
+{
+    var a0 = (a >> 16) & 0xFF;
+    var a1 = (a >> 8) & 0xFF;
+    var a2 = a & 0xFF;
+
+    var b0 = (b >> 16) & 0xFF;
+    var b1 = (b >> 8) & 0xFF;
+    var b2 = b & 0xFF;
+
+    var invt = 1.0 - t;
+    return 0xFF000000 | 
+        Math.floor(a0*invt + b0*t) << 16 |
+        Math.floor(a1*invt + b1*t) << 8 |
+        Math.floor(a2*invt + b2*t);
+}
+
+// ---------------------------------------------
+// Interpolate between two numbers.
+// The output is a float.
+
+function NumberInterp(a, b, t)
+{
+    var invt = 1.0 - t;
+    return (a * invt) + (b * t);
+}
+
+// ---------------------------------------------
+// The mbin render routine
 
 function Render()
 {
@@ -387,6 +420,8 @@ function Render()
         hiddeny[i] = screendata.canvas.height;
 
     var deltaz = 1.;
+
+    var bilinear = document.getElementById('bilinear').checked;
 
     // Draw from front to back
     for(var z=1; z<camera.distance; z+=deltaz)
@@ -404,9 +439,43 @@ function Render()
         var invz = 1. / z * 240.;
         for(var i=0; i<screenwidth|0; i=i+1|0)
         {
-            var mapoffset = ((Math.floor(ply) & mapwidthperiod) << map.shift) + (Math.floor(plx) & mapheightperiod)|0;
-            var heightonscreen = (camera.height - map.altitude[mapoffset]) * invz + camera.horizon|0;
-            DrawVerticalLine(i, heightonscreen|0, hiddeny[i], map.color[mapoffset]);
+            var final_color;
+            var altitude;
+            if(bilinear)
+            {
+                var plxt = plx - Math.floor(plx);
+                var plyt = ply - Math.floor(ply);
+
+                var plx_left = (Math.floor(plx) & mapwidthperiod);
+                var plx_right = (Math.floor(plx+1) & mapwidthperiod);
+                var ply_lower = (Math.floor(ply) & mapwidthperiod) << map.shift;
+                var ply_upper = (Math.floor(ply+1) & mapwidthperiod) << map.shift;
+
+                var llindex = ply_lower + plx_left;
+                var ulindex = ply_upper + plx_left;
+                var urindex = ply_upper + plx_right;
+                var lrindex = ply_lower + plx_right;
+
+                // Interpolate the top and bottom edges to a point on each, then interpolate
+                // between those to get the final color.
+                var upper_color = ColorInterp(map.color[ulindex], map.color[urindex], plxt);
+                var lower_color = ColorInterp(map.color[llindex], map.color[lrindex], plxt);
+                final_color = ColorInterp(lower_color, upper_color, plyt);
+
+                // Do the same for altitude.
+                var upper_alt = NumberInterp(map.altitude[ulindex], map.altitude[urindex], plxt);
+                var lower_alt = NumberInterp(map.altitude[llindex], map.altitude[lrindex], plxt);
+                altitude = NumberInterp(lower_alt, upper_alt, plyt);
+            }
+            else
+            {
+                var mapoffset = ((Math.floor(ply) & mapwidthperiod) << map.shift) + (Math.floor(plx) & mapheightperiod)|0;
+                altitude = map.altitude[mapoffset];
+                final_color = map.color[mapoffset];
+            }
+
+            var heightonscreen = (camera.height - altitude) * invz + camera.horizon|0;
+            DrawVerticalLine(i, heightonscreen|0, hiddeny[i], final_color);
             if (heightonscreen < hiddeny[i]) hiddeny[i] = heightonscreen;
             plx += dx;
             ply += dy;
