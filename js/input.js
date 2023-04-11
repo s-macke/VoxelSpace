@@ -8,8 +8,8 @@ var input =
     forwardbackward: 0,
     leftright:       0,
     updown:          0,
-    lookup:          false,
-    lookdown:        false,
+    lookleftright:   0,
+    lookupdown:      0,
     mouseposition:   null,
     keypressed:      false
 }
@@ -48,7 +48,7 @@ function DetectMouseUp()
 {
     input.mouseposition = null;
     input.forwardbackward = 0;
-    input.leftright = 0;
+    input.lookleftright = 0;
     input.updown = 0;
     return;
 }
@@ -57,11 +57,10 @@ function DetectMouseMove(e)
 {
     e.preventDefault();
     if (input.mouseposition == null) return;
-    if (input.forwardbackward == 0) return;
 
     var currentMousePosition = GetMousePosition(e);
 
-    input.leftright = (input.mouseposition[0] - currentMousePosition[0]) / window.innerWidth * 2;
+    input.lookleftright = (input.mouseposition[0] - currentMousePosition[0]) / window.innerWidth * 2;
     camera.horizon  = 100 + (input.mouseposition[1] - currentMousePosition[1]) / window.innerHeight * 500;
     input.updown    = (input.mouseposition[1] - currentMousePosition[1]) / window.innerHeight * 10;
 }
@@ -73,15 +72,15 @@ function DetectKeysDown(e)
     {
     case 37:    // left cursor
     case 65:    // a
-        input.leftright = +1.;
+        input.leftright = +2.;
         break;
     case 39:    // right cursor
     case 68:    // d
-        input.leftright = -1.;
+        input.leftright = -2.;
         break;
     case 38:    // cursor up
     case 87:    // w
-        input.forwardbackward = 3.;
+        input.forwardbackward = +3.;
         break;
     case 40:    // cursor down
     case 83:    // s
@@ -94,10 +93,10 @@ function DetectKeysDown(e)
         input.updown = -2.;
         break;
     case 69:    // e
-        input.lookup = true;
+        input.lookupdown = +2;
         break;
     case 81:    //q
-        input.lookdown = true;
+        input.lookupdown = -2;
         break;
     default:
         return;
@@ -138,10 +137,10 @@ function DetectKeysUp(e)
         input.updown = 0;
         break;
     case 69:    // e
-        input.lookup = false;
+        input.lookupdown = 0;
         break;
     case 81:    //q
-        input.lookdown = false;
+        input.lookupdown = 0;
         break;
     default:
         return;

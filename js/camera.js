@@ -20,9 +20,9 @@ function UpdateCamera()
     var current = new Date().getTime();
 
     input.keypressed = false;
-    if (input.leftright != 0)
+    if (input.lookleftright != 0)
     {
-        camera.angle += input.leftright*0.1*(current-time)*0.03;
+        camera.angle += input.lookleftright*0.1*(current-time)*0.03;
         input.keypressed = true;
     }
     if (input.forwardbackward != 0)
@@ -31,19 +31,20 @@ function UpdateCamera()
         camera.y -= input.forwardbackward * Math.cos(camera.angle) * (current-time)*0.03;
         input.keypressed = true;
     }
+    if (input.leftright != 0)
+    {
+        camera.x -= input.leftright * Math.sin(1.57+camera.angle) * (current-time)*0.03;
+        camera.y -= input.leftright * Math.cos(1.57+camera.angle) * (current-time)*0.03;
+        input.keypressed = true;
+    }
     if (input.updown != 0)
     {
         camera.height += input.updown * (current-time)*0.03;
         input.keypressed = true;
     }
-    if (input.lookup)
+    if (input.lookupdown)
     {
-        camera.horizon += 2 * (current-time)*0.03;
-        input.keypressed = true;
-    }
-    if (input.lookdown)
-    {
-        camera.horizon -= 2 * (current-time)*0.03;
+        camera.horizon += input.lookupdown * (current-time)*0.03;
         input.keypressed = true;
     }
 
